@@ -22,6 +22,17 @@ clock = pygame.time.Clock()
 player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.jpg")).convert()
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert()
 
+car_scale1 = 0.2
+car_scale2 = 0.3        # Adjust this value to scale the cars as needed
+player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
+enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
+
+
+
+
+
+
+
 # Initialize player car position
 player_x = WIDTH // 2 - player_car_img.get_width() // 2
 player_y = HEIGHT - player_car_img.get_height() - 20
@@ -37,45 +48,10 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
-<<<<<<< HEAD
-    moved = False
-
-    if keys[pygame.K_a]:
-        player_car.rotate(left=True)
-    if keys[pygame.K_d]:
-        player_car.rotate(right=True)
-    if keys[pygame.K_w]:
-        moved = True
-        player_car.move_forward()
-
-    if not moved:
-        player_car.reduce_speed()
-        
-#halihalo
-
-
-pygame.quit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
     if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
         player_x -= LANE_WIDTH
     if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
         player_x += LANE_WIDTH
->>>>>>> 6bc1d41b10ef99a79af0a1627fa08635cc5537be
 
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
@@ -107,3 +83,4 @@ pygame.quit()
 
     pygame.display.flip()
     clock.tick(FPS)
+
