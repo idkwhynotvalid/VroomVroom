@@ -95,6 +95,8 @@ while run:
 
     if not moved:
         player_car.reduce_speed()
+        
+#halihalo
 
 
 pygame.quit()
