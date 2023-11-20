@@ -53,7 +53,15 @@ while True:
     if keys[pygame.K_LEFT] and player_x - LANE_WIDTH //3 >= 0:
         player_x -= 8
     if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH //3 <= WIDTH - player_car_img.get_width():
+<<<<<<< Updated upstream
         player_x += 8
+=======
+        player_x += 4
+    if keys[pygame.K_UP] and player_y - 30>= 0:
+        player_y -= 4
+    if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
+        player_y += 4
+>>>>>>> Stashed changes
 
     # Calculate elapsed time
     current_time = time.time() - start_time
