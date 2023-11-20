@@ -12,6 +12,7 @@ FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 LANE_WIDTH = 150
+LANE_WIDTH1 = 150
 NUM_LANES = 3
 
 # Create the game window
@@ -57,7 +58,7 @@ while True:
 
     for lane in range(NUM_LANES):
         if random.randint(0, 1000) < 3:  # Adjust the probability for more or fewer enemy cars
-            enemy_cars.append([random.choice([player_x, player_x + LANE_WIDTH - enemy_car_img.get_width()]), -enemy_car_img.get_height()])
+            enemy_cars.append([random.choice([200- 0.5*enemy_car_img.get_width(), 400- 0.5*enemy_car_img.get_width(), 600- 0.5*enemy_car_img.get_width()]), -enemy_car_img.get_height()])
 
     # Check for collisions
     player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
