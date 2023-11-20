@@ -2,6 +2,7 @@ import pygame
 import random
 import sys
 import os
+import time 
 
 # Initialize Pygame
 pygame.init()
@@ -12,8 +13,9 @@ FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 LANE_WIDTH = 150
-LANE_WIDTH1 = 150
 NUM_LANES = 3
+clock = pygame.time.Clock()
+timer = 0
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -25,8 +27,8 @@ player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "play
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert()
 
 # Scale the car images
-car_scale1 = 0.4
-car_scale2 = 0.7
+car_scale1 = 0.3
+car_scale2 = 0.6
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
 enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
 
@@ -79,6 +81,9 @@ while True:
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car[0], car[1]))
 
+    milliseconds = clock.tick(60) 
+    timer += milliseconds / 1000
     pygame.display.flip()
+    print(timer)
     clock.tick(FPS)
 
