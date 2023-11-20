@@ -14,8 +14,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 LANE_WIDTH = 150
 NUM_LANES = 3
-clock = pygame.time.Clock()
-timer = 0
+
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -27,8 +26,8 @@ player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "play
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert()
 
 # Scale the car images
-car_scale1 = 0.3
-car_scale2 = 0.6
+car_scale1 = 0.2
+car_scale2 = 0.5
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
 enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
 
@@ -39,6 +38,10 @@ player_y = HEIGHT - player_car_img.get_height() - 20
 # Initialize enemy cars
 enemy_cars = []
 
+# Initialize variables
+start_time = time.time()
+enemy_speed = 5  # Initial speed of enemy cars
+
 # Game loop
 while True:
     for event in pygame.event.get():
@@ -48,18 +51,25 @@ while True:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x - LANE_WIDTH //3 >= 0:
-        player_x -= 4
+        player_x -= 8
     if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH //3 <= WIDTH - player_car_img.get_width():
-        player_x += 4
+        player_x += 8
 
+    # Calculate elapsed time
+    current_time = time.time() - start_time
+    
+    # Increase enemy speed over time
+    if current_time > 2:  # Adjust the time to change speed
+        enemy_speed = 4  # Adjust the new speed
+    
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car[1] += 5  # Adjust the speed of enemy cars
+        car[1] += enemy_speed  # Adjust the speed of enemy cars
         if car[1] > HEIGHT:
             enemy_cars.remove(car)
 
     for lane in range(NUM_LANES):
-        if random.randint(0, 1000) < 3:  # Adjust the probability for more or fewer enemy cars
+        if random.randint(0, 800) < 3:  # Adjust the probability for more or fewer enemy cars
             enemy_cars.append([random.choice([200- 0.5*enemy_car_img.get_width(), 400- 0.5*enemy_car_img.get_width(), 600- 0.5*enemy_car_img.get_width()]), -enemy_car_img.get_height()])
 
     # Check for collisions
@@ -81,9 +91,7 @@ while True:
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car[0], car[1]))
 
-    milliseconds = clock.tick(60) 
-    timer += milliseconds / 1000
+
     pygame.display.flip()
-    print(timer)
     clock.tick(FPS)
 
