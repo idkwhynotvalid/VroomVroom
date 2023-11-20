@@ -10,6 +10,7 @@ pygame.init()
 # Constants
 WIDTH, HEIGHT = 800, 600
 FPS = 60
+RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 LANE_WIDTH = 150
@@ -106,7 +107,7 @@ while True:
     # Game over screen
     if game_over == True:
         font = pygame.font.Font(None, 36)
-        text = font.render("Game Over!", True, WHITE)
+        text = font.render("Game Over!", True, RED)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(text, text_rect)
         pygame.display.flip()
