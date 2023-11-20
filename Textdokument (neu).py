@@ -40,7 +40,7 @@ enemy_cars = []
 
 # Initialize variables
 start_time = time.time()
-enemy_speed = 5  # Initial speed of enemy cars
+enemy_speed = 10  # Initial speed of enemy cars
 
 # Game loop
 while True:
@@ -53,26 +53,22 @@ while True:
     if keys[pygame.K_LEFT] and player_x - LANE_WIDTH //3 >= 0:
         player_x -= 8
     if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH //3 <= WIDTH - player_car_img.get_width():
-<<<<<<< Updated upstream
         player_x += 8
-=======
-        player_x += 4
     if keys[pygame.K_UP] and player_y - 30>= 0:
-        player_y -= 4
+        player_y -= 6
     if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
-        player_y += 4
->>>>>>> Stashed changes
+        player_y += 6
+
 
     # Calculate elapsed time
     current_time = time.time() - start_time
     
     # Increase enemy speed over time
-    if current_time > 2:  # Adjust the time to change speed
-        enemy_speed = 4  # Adjust the new speed
+        
     
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car[1] += enemy_speed  # Adjust the speed of enemy cars
+        car[1] += current_time**0.5  # Adjust the speed of enemy cars
         if car[1] > HEIGHT:
             enemy_cars.remove(car)
 
