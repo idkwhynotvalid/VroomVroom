@@ -41,6 +41,7 @@ enemy_cars = []
 # Initialize variables
 start_time = time.time()
 enemy_speed = 10  # Initial speed of enemy cars
+game_over = False
 
 # Game loop
 while True:
@@ -50,14 +51,15 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x - LANE_WIDTH //3 >= 0:
-        player_x -= 8
-    if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH //3 <= WIDTH - player_car_img.get_width():
-        player_x += 8
-    if keys[pygame.K_UP] and player_y - 30>= 0:
-        player_y -= 6
-    if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
-        player_y += 6
+    if not game_over:
+        if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
+            player_x -= 8
+        if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
+            player_x += 8
+        if keys[pygame.K_UP] and player_y - 30>= 0:
+            player_y -= 6
+        if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
+            player_y += 6
 
 
     # Calculate elapsed time
@@ -81,13 +83,15 @@ while True:
     for car in enemy_cars:
         enemy_rect = pygame.Rect(car[0], car[1], enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
-            print("Game Over!")
-            pygame.quit()
-            sys.exit()
+            game_over=True
 
     # Draw background
     screen.fill(BLACK)
-
+    screen.blit(player_car_img, (player_x, player_y))
+    for car in enemy_cars:
+        screen.blit(enemy_car_img, (car[0], car[1]))
+    
+    
     # Draw player car
     screen.blit(player_car_img, (player_x, player_y))
 
@@ -98,4 +102,17 @@ while True:
 
     pygame.display.flip()
     clock.tick(FPS)
+    
+    # Game over screen
+    if game_over == True:
+        font = pygame.font.Font(None, 36)
+        text = font.render("Game Over!", True, WHITE)
+        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+
+        # Wait for a few seconds before quitting
+        pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
+        pygame.quit()
+        sys.exit()
 
