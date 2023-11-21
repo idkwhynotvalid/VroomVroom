@@ -44,6 +44,12 @@ start_time = time.time()
 enemy_speed = 10  # Initial speed of enemy cars
 game_over = False
 
+
+# Add variables to hold rotation angle and rotation speed
+angle = 0
+rotation_speed = 5
+
+
 # Game loop
 while True:
     for event in pygame.event.get():
@@ -85,6 +91,23 @@ while True:
         enemy_rect = pygame.Rect(car[0], car[1], enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
             game_over=True
+    
+    
+    # Inside the game loop, update the rotation angle based on the movement keys
+    if not game_over:
+       if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
+           player_x -= 8
+           angle = rotation_speed  # Update the angle for left movement
+       if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
+           player_x += 8
+           angle = -rotation_speed  # Update the angle for right movement
+    
+    # Rotate the player car image
+    rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+    rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
+    # Draw rotated player car
+    screen.blit(rotated_player_car, rotated_rect)
+    
 
     # Draw background
     screen.fill(BLACK)
@@ -94,7 +117,7 @@ while True:
     
     
     # Draw player car
-    screen.blit(player_car_img, (player_x, player_y))
+   # screen.blit(player_car_img, (player_x, player_y))
 
     # Draw enemy cars
     for car in enemy_cars:
