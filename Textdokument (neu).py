@@ -61,8 +61,10 @@ while True:
     if not game_over:
         if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
             player_x -= 8
+            angle = rotation_speed
         if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
             player_x += 8
+            angle = -rotation_speed
         if keys[pygame.K_UP] and player_y - 30>= 0:
             player_y -= 6
         if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
@@ -93,14 +95,8 @@ while True:
             game_over=True
     
     
-    # Inside the game loop, update the rotation angle based on the movement keys
-    if not game_over:
-       if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
-           player_x -= 8
-           angle = rotation_speed  # Update the angle for left movement
-       if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
-           player_x += 8
-           angle = -rotation_speed  # Update the angle for right movement
+   
+    
     
     # Rotate the player car image
     rotated_player_car = pygame.transform.rotate(player_car_img, angle)
