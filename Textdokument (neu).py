@@ -8,7 +8,7 @@ import time
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 800, 1000
 FPS = 60
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
