@@ -10,8 +10,6 @@ pygame.init()
 # Constants
 WIDTH, HEIGHT = 800, 600
 FPS = 60
-
-
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -49,7 +47,7 @@ game_over = False
 
 # Add variables to hold rotation angle and rotation speed
 angle = 0
-rotation_speed = 5
+rotation_speed = 1
 
 
 # Game loop
@@ -61,18 +59,26 @@ while True:
 
     keys = pygame.key.get_pressed()
     if not game_over:
+        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+            if angle > 0:
+                angle -= rotation_speed
+            elif angle < 0:
+                angle += rotation_speed
+        
+        
+        
         if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
             player_x -= 8
-            angle = rotation_speed
+            angle += rotation_speed
         if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
             player_x += 8
-            angle = -rotation_speed
+            angle -= rotation_speed
         if keys[pygame.K_UP] and player_y - 30>= 0:
             player_y -= 6
         if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
             player_y += 6
 
-
+        
     # Calculate elapsed time
     current_time = time.time() - start_time
     
@@ -100,11 +106,7 @@ while True:
    
     
     
-    # Rotate the player car image
-    rotated_player_car = pygame.transform.rotate(player_car_img, angle)
-    rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
-    # Draw rotated player car
-    screen.blit(rotated_player_car, rotated_rect)
+   
     
 
     # Draw background
@@ -113,9 +115,15 @@ while True:
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car[0], car[1]))
     
+    # Rotate the player car image
+    rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+    rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
+    # Draw rotated player car
+    screen.blit(rotated_player_car, rotated_rect)
+    
     
     # Draw player car
-   # screen.blit(player_car_img, (player_x, player_y))
+    # screen.blit(player_car_img, (player_x, player_y))
 
     # Draw enemy cars
     for car in enemy_cars:
