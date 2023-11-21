@@ -8,7 +8,9 @@ import time
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 800, 600
+
+WIDTH, HEIGHT = 900, 1000
+
 FPS = 60
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
@@ -46,8 +48,10 @@ game_over = False
 
 
 # Add variables to hold rotation angle and rotation speed
+
 angle = 0
 rotation_speed = 1
+
 
 
 # Game loop
@@ -82,18 +86,21 @@ while True:
     # Calculate elapsed time
     current_time = time.time() - start_time
     
-    # Increase enemy speed over time
-        
-    
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
         car[1] += current_time**0.5  # Adjust the speed of enemy cars
         if car[1] > HEIGHT:
             enemy_cars.remove(car)
-
+            
+            
     for lane in range(NUM_LANES):
-        if random.randint(0, 800) < 3:  # Adjust the probability for more or fewer enemy cars
-            enemy_cars.append([random.choice([200- 0.5*enemy_car_img.get_width(), 400- 0.5*enemy_car_img.get_width(), 600- 0.5*enemy_car_img.get_width()]), -enemy_car_img.get_height()])
+        if random.randint(0, 800) < 6:
+            x_position = random.choice([300 - 0.5 * enemy_car_img.get_width(), 400 - 0.5 * enemy_car_img.get_width(), 500 - 0.5 * enemy_car_img.get_width(), 600 - 0.5 * enemy_car_img.get_width()])
+            too_close = any(abs(x_position - car[0]) < enemy_car_img.get_width() for car in enemy_cars if car[1] < HEIGHT and car[0] == x_position)
+            if not too_close:
+                enemy_cars.append([x_position, -enemy_car_img.get_height()])
+
+
 
     # Check for collisions
     player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
@@ -145,4 +152,7 @@ while True:
         pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
         pygame.quit()
         sys.exit()
+        
+        
+#different speed for cars, 4 lanes.
 
