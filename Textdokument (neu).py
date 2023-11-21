@@ -10,6 +10,8 @@ pygame.init()
 # Constants
 WIDTH, HEIGHT = 800, 600
 FPS = 120
+
+
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
