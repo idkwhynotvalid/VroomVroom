@@ -88,7 +88,7 @@ while True:
     
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car[1] += current_time**0.5  # Adjust the speed of enemy cars
+        car[1] += current_time**0.5 + car[2]
         if car[1] > HEIGHT:
             enemy_cars.remove(car)
             
@@ -98,11 +98,10 @@ while True:
             x_position = random.choice([187.5 - 0.5 * enemy_car_img.get_width(), 362.5 - 0.5 * enemy_car_img.get_width(), 537.5 - 0.5 * enemy_car_img.get_width(), 712.5 - 0.5 * enemy_car_img.get_width()])
             too_close = any(abs(x_position - car[0]) < enemy_car_img.get_width() for car in enemy_cars if car[1] < HEIGHT and car[0] == x_position)
             if not too_close:
-                enemy_cars.append([x_position, -enemy_car_img.get_height()])
+                speed = random.randint(1, 5)
+                enemy_cars.append([x_position, -enemy_car_img.get_height(), speed])
 
 
-
-    # Check for collisions
     player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
     for car in enemy_cars:
         enemy_rect = pygame.Rect(car[0], car[1], enemy_car_img.get_width(), enemy_car_img.get_height())
