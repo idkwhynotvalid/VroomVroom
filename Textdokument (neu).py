@@ -3,7 +3,7 @@ import random
 import sys
 import os
 import time 
-
+from random import randrange 
 # Initialize Pygame
 pygame.init()
 
@@ -65,9 +65,9 @@ while True:
     if not game_over:
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             if angle > 0:
-                angle -= rotation_speed
+                angle -= 2*rotation_speed
             elif angle < 0:
-                angle += rotation_speed
+                angle += 2*rotation_speed
         
         
         
