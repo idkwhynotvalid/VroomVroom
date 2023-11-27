@@ -31,6 +31,7 @@ class Car:
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3-Lane Car Highway Game")
 clock = pygame.time.Clock()
+score = 0
 
 # Load car images
 player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.jpg")).convert()
@@ -89,6 +90,9 @@ while True:
 
     # Calculate elapsed time
     current_time = time.time() - start_time
+    if int(current_time) % 1 == 0:
+        score += 1/60
+
 
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
@@ -125,7 +129,12 @@ while True:
     # Draw enemy cars
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
-
+    
+    score2 = int(score)
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score2}", True, "WHITE")
+    score_rect = score_text.get_rect(topright=(WIDTH - 10, 10))
+    screen.blit(score_text, score_rect)
     pygame.display.flip()
     clock.tick(FPS)
 
@@ -134,6 +143,7 @@ while True:
         font = pygame.font.Font(None, 36)
         text = font.render("Game Over!", True, RED)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            
         screen.blit(text, text_rect)
         pygame.display.flip()
 
