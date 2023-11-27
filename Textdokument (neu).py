@@ -2,8 +2,13 @@ import pygame
 import random
 import sys
 import os
+<<<<<<< HEAD
 import time
 
+=======
+import time 
+from random import randrange 
+>>>>>>> c3d3ffeca0564769ef9d587860a5a9a5f8551830
 # Initialize Pygame
 pygame.init()
 
@@ -64,10 +69,17 @@ while True:
     if not game_over:
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             if angle > 0:
-                angle -= rotation_speed
+                angle -= 2*rotation_speed
             elif angle < 0:
+<<<<<<< HEAD
                 angle += rotation_speed
 
+=======
+                angle += 2*rotation_speed
+        
+        
+        
+>>>>>>> c3d3ffeca0564769ef9d587860a5a9a5f8551830
         if keys[pygame.K_LEFT] and player_x >= 150:
             player_x -= 8
             angle += rotation_speed
