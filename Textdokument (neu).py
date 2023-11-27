@@ -2,21 +2,24 @@ import pygame
 import random
 import sys
 import os
-import time 
+import time
 
 # Initialize Pygame
 pygame.init()
 
 # Constants
-
 WIDTH, HEIGHT = 900, 1000
-
 FPS = 60
 RED = (255, 0, 0)
-WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-LANE_WIDTH = 150
 NUM_LANES = 3
+
+
+class Car:
+    def __init__(self, x_position, initial_speed):
+        self.x = x_position
+        self.y = -player_car_img.get_height() # Start above the screen
+        self.speed = initial_speed
 
 
 # Create the game window
@@ -43,15 +46,11 @@ enemy_cars = []
 
 # Initialize variables
 start_time = time.time()
-enemy_speed = 10  # Initial speed of enemy cars
 game_over = False
 
-
 # Add variables to hold rotation angle and rotation speed
-
 angle = 0
 rotation_speed = 1
-
 
 
 # Game loop
@@ -68,79 +67,62 @@ while True:
                 angle -= rotation_speed
             elif angle < 0:
                 angle += rotation_speed
-        
-        
-        
+
         if keys[pygame.K_LEFT] and player_x >= 150:
             player_x -= 8
             angle += rotation_speed
         if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= 750:
             player_x += 8
             angle -= rotation_speed
-        if keys[pygame.K_UP] and player_y - 30>= 0:
+        if keys[pygame.K_UP] and player_y - 30 >= 0:
             player_y -= 6
         if keys[pygame.K_DOWN] and player_y + 30 + enemy_car_img.get_height() <= HEIGHT:
             player_y += 6
 
-        
     # Calculate elapsed time
     current_time = time.time() - start_time
-    
+
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car[1] += current_time**0.5 + car[2]
-        if car[1] > HEIGHT:
+        car.y += current_time**0.5 + car.speed
+        if car.y > HEIGHT:
             enemy_cars.remove(car)
-            
-            
+
     for lane in range(NUM_LANES):
         if random.randint(0, 800) < 6:
             x_position = random.choice([187.5 - 0.5 * enemy_car_img.get_width(), 362.5 - 0.5 * enemy_car_img.get_width(), 537.5 - 0.5 * enemy_car_img.get_width(), 712.5 - 0.5 * enemy_car_img.get_width()])
-            too_close = any(abs(x_position - car[0]) < enemy_car_img.get_width() for car in enemy_cars if car[1] < HEIGHT and car[0] == x_position)
+            too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
             if not too_close:
                 speed = random.randint(1, 5)
-                enemy_cars.append([x_position, -enemy_car_img.get_height(), speed])
-
+                enemy_cars.append(Car(x_position, speed))
 
     player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
     for car in enemy_cars:
-        enemy_rect = pygame.Rect(car[0], car[1], enemy_car_img.get_width(), enemy_car_img.get_height())
+        enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
-            game_over=True
-    
-    
-   
-    
-    
-   
-    
+            game_over = True
 
     # Draw background
     screen.fill(BLACK)
     screen.blit(player_car_img, (player_x, player_y))
     for car in enemy_cars:
-        screen.blit(enemy_car_img, (car[0], car[1]))
-    
+        screen.blit(enemy_car_img, (car.x, car.y))
+
     # Rotate the player car image
     rotated_player_car = pygame.transform.rotate(player_car_img, angle)
     rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
     # Draw rotated player car
     screen.blit(rotated_player_car, rotated_rect)
-    
-    
-    # Draw player car
-    # screen.blit(player_car_img, (player_x, player_y))
 
     # Draw enemy cars
     for car in enemy_cars:
-        screen.blit(enemy_car_img, (car[0], car[1]))
-
+        screen.blit(enemy_car_img, (car.x, car.y))
 
     pygame.display.flip()
     clock.tick(FPS)
-    
+
     # Game over screen
-    if game_over == True:
+    if game_over:
         font = pygame.font.Font(None, 36)
         text = font.render("Game Over!", True, RED)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
@@ -151,7 +133,6 @@ while True:
         pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
         pygame.quit()
         sys.exit()
-        
         
 #different speed for cars, 4 lanes.
 
