@@ -71,10 +71,10 @@ while True:
         
         
         
-        if keys[pygame.K_LEFT] and player_x - LANE_WIDTH >= 0:
+        if keys[pygame.K_LEFT] and player_x >= 150:
             player_x -= 8
             angle += rotation_speed
-        if keys[pygame.K_RIGHT] and player_x + LANE_WIDTH <= WIDTH - player_car_img.get_width():
+        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= 750:
             player_x += 8
             angle -= rotation_speed
         if keys[pygame.K_UP] and player_y - 30>= 0:
@@ -95,7 +95,7 @@ while True:
             
     for lane in range(NUM_LANES):
         if random.randint(0, 800) < 6:
-            x_position = random.choice([300 - 0.5 * enemy_car_img.get_width(), 400 - 0.5 * enemy_car_img.get_width(), 500 - 0.5 * enemy_car_img.get_width(), 600 - 0.5 * enemy_car_img.get_width()])
+            x_position = random.choice([187.5 - 0.5 * enemy_car_img.get_width(), 362.5 - 0.5 * enemy_car_img.get_width(), 537.5 - 0.5 * enemy_car_img.get_width(), 712.5 - 0.5 * enemy_car_img.get_width()])
             too_close = any(abs(x_position - car[0]) < enemy_car_img.get_width() for car in enemy_cars if car[1] < HEIGHT and car[0] == x_position)
             if not too_close:
                 enemy_cars.append([x_position, -enemy_car_img.get_height()])
