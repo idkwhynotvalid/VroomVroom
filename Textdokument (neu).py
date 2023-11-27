@@ -3,7 +3,7 @@ import random
 import sys
 import os
 import time 
-
+from random import randrange 
 # Initialize Pygame
 pygame.init()
 
@@ -65,9 +65,9 @@ while True:
     if not game_over:
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             if angle > 0:
-                angle -= rotation_speed
+                angle -= 2*rotation_speed
             elif angle < 0:
-                angle += rotation_speed
+                angle += 2*rotation_speed
         
         
         
@@ -88,7 +88,7 @@ while True:
     
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car[1] += current_time**0.5  # Adjust the speed of enemy cars
+        car[1] += current_time**0.5   # Adjust the speed of enemy cars
         if car[1] > HEIGHT:
             enemy_cars.remove(car)
             
