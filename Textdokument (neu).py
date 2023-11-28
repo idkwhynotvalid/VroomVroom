@@ -26,6 +26,15 @@ class Car:
         self.y = -player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
 
+acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+        
+ 
+
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
