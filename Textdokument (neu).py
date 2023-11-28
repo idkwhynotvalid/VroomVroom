@@ -96,9 +96,11 @@ while True:
 
     # Move enemy cars and spawn new ones
     for car in enemy_cars:
-        car.y += current_time**0.5 + car.speed
+        distance_to_bottom = HEIGHT - player_y
+        car.y += current_time ** 0.5 + car.speed + 0.01 * distance_to_bottom
         if car.y > HEIGHT:
             enemy_cars.remove(car)
+
 
     for lane in range(NUM_LANES):
         if random.randint(0, 800) < 6:
@@ -130,6 +132,9 @@ while True:
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
     
+
+
+
     score2 = int(score)
     font = pygame.font.Font(None, 36)
     score_text = font.render(f"Score: {score2}", True, "WHITE")
