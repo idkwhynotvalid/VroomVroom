@@ -13,7 +13,9 @@ from random import randrange
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 900, 1000
+screen_info = pygame.display.Info()
+
+WIDTH, HEIGHT = 900, screen_info.current_h - 85
 FPS = 60
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
