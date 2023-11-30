@@ -28,7 +28,21 @@ class Car:
         self.y = -player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
 
+circle_radius = 20
+circle_color_normal = (0, 255, 0)  # Green
+circle_color_warning = (255, 0, 0)  # Red
+circle_spawn_interval = 10  # in seconds
+circle_warning_duration = 2  # in seconds
 
+class Circle:
+    def __init__(self, player_x):
+        self.x = player_x
+        self.y = -circle_radius
+        self.color = (255, 255, 255)
+        self.warning_start_time = None
+        
+        
+        
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3-Lane Car Highway Game")
@@ -51,6 +65,8 @@ player_y = HEIGHT - player_car_img.get_height() - 20
 
 # Initialize enemy cars
 enemy_cars = []
+#circles
+circles = []
 
 # Initialize variables
 start_time = time.time()
@@ -94,6 +110,9 @@ while True:
     current_time = time.time() - start_time
     if int(current_time) % 1 == 0:
         score += 1/60
+    elapsed_time = time.time() - start_time
+    if elapsed_time % circle_spawn_interval < 0.1:
+        circles.append(Circle(player_x))
 
 
     # Move enemy cars and spawn new ones
@@ -117,7 +136,26 @@ while True:
         enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
             game_over = True
+    
+    
+    for circle in circles:
+        circle.y += current_time ** 0.5  # Adjust the movement speed as needed
 
+        # Check if the player collides with the circle
+        circle_rect = pygame.Rect(circle.x - circle_radius, circle.y - circle_radius, 2 * circle_radius, 2 * circle_radius)
+        if player_rect.colliderect(circle_rect):
+            if circle.color == circle_color_warning:
+                game_over = True
+            else:
+                circle.warning_start_time = time.time()
+                circle.color = circle_color_warning
+
+        # Remove circles that go off-screen or have exceeded the warning duration
+        if circle.y > HEIGHT or (circle.warning_start_time and time.time() - circle.warning_start_time > circle_warning_duration):
+            circles.remove(circle)
+    
+    
+    
     # Draw background
     screen.fill(BLACK)
     screen.blit(player_car_img, (player_x, player_y))
@@ -133,8 +171,11 @@ while True:
     # Draw enemy cars
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
-    
 
+
+    # Draw circles
+    for circle in circles:
+        pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
 
 
     score2 = int(score)
