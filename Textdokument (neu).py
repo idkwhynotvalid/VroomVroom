@@ -29,6 +29,7 @@ class Car:
         self.y = -player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
 
+
 circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
@@ -67,11 +68,38 @@ class Circle:
         
         
         
+
+acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+        
+ 
+
+class Helicopter:
+    def __init__(self, x_position2):
+        self.x = x_position2
+        self.y = y_position2
+
+
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("3-Lane Car Highway Game")
 clock = pygame.time.Clock()
 score = 0
+
+
+
+# Load helicopter image
+helicopter_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
+
+# Scale the helicopter image
+helicopter_scale = 0.05
+helicopter_img = pygame.transform.scale(helicopter_img, (int(helicopter_img.get_width() * helicopter_scale), int(helicopter_img.get_height() * helicopter_scale)))
+x_position2 = WIDTH // 2 - helicopter_img.get_width() // 2
+y_position2 = HEIGHT - helicopter_img.get_height() -50
 
 # Load car images
 player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.jpg")).convert()
@@ -85,7 +113,9 @@ enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_wid
 
 # Initialize player car position
 player_x = WIDTH // 2 - player_car_img.get_width() // 2
+
 player_y = HEIGHT - HEIGHT / 5
+
 # Initialize enemy cars
 enemy_cars = []
 #circles
@@ -110,11 +140,14 @@ while True:
     keys = pygame.key.get_pressed()
     if not game_over:
         if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
-            if angle > 0:
+            if angle >0:
                 angle -= 2*rotation_speed
-            elif angle < 0:
+                if angle <=1 and angle >=-1:
+                    angle = 0
+            elif angle <0:
                 angle += 2*rotation_speed
-        
+                if angle <= 1 and angle>=-1:
+                    angle = 0
         
         
 
@@ -129,6 +162,9 @@ while True:
         if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
             player_y += 6
 
+    
+        
+        
     # Calculate elapsed time
     current_time = time.time() - start_time
     if int(current_time) % 1 == 0:
@@ -201,6 +237,15 @@ while True:
     # Draw rotated player car
     screen.blit(rotated_player_car, rotated_rect)
 
+    #Helicopter
+    rotated_helicopter = pygame.transform.rotate(helicopter_img, angle)
+    rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
+    # Draw rotated helicopter
+    screen.blit(rotated_helicopter, rotated_rect2)
+    
+    
+    
+    
     # Draw enemy cars
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
