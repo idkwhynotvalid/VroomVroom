@@ -159,10 +159,10 @@ while True:
         
         
 
-        if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*350:
+        if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
             player_x -= 8
             angle += rotation_speed
-        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*350):
+        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
             player_x += 8
             angle -= rotation_speed
         if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
