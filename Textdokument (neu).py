@@ -29,17 +29,34 @@ class Car:
         self.y = -player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
 
-circle_radius = 20
+circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
-circle_spawn_interval = 10  # in seconds
-circle_warning_duration = 2  # in seconds
+circle_spawn_interval = 20  # in seconds
+circle_follow = 8
+circle_warning_duration = 6  # in seconds
+elapsed_time = 0 
+last_circle_spawn_time = 0
 
 
 def spawn_circle():
     circle = Circle(player_x)
     circles.append(circle)
     return time.time()
+
+def remove_expired_circles():
+    for circle in circles.copy():
+        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
+            circle.color = circle_color_warning    
+        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
+            circles.remove(circle)
+            
+def is_collision(rect, circle):
+    closest_x = max(rect.left, min(circle.x, rect.right))
+    closest_y = max(rect.top, min(circle.y, rect.bottom))
+    distance = math.sqrt((circle.x - closest_x) ** 2 + (circle.y - closest_y) ** 2)
+    return distance < circle.radius
+
 
 class Circle:
     def __init__(self, player_x):
@@ -77,9 +94,7 @@ circles = []
 # Initialize variables
 start_time = time.time()
 game_over = False
-last_circle_spawn_time = pygame.time.get_ticks()
-circle_follow_duration = 4  # in seconds
-circle_follow_start_time = None
+
 # Add variables to hold rotation angle and rotation speed
 angle = 0
 rotation_speed = 1
@@ -124,10 +139,10 @@ while True:
         
   
 
-    elapsed_time = time.time() - start_time
-    if elapsed_time - last_circle_spawn_time >= circle_spawn_interval:
+    elapsed_time += 1
+    if int(elapsed_time) % (circle_spawn_interval * 60) == 0:
         last_circle_spawn_time = spawn_circle()
-        
+    remove_expired_circles()
 
 
 
@@ -142,8 +157,6 @@ while True:
             enemy_cars.remove(car)
 
 
-    if circle_follow_start_time and time.time() - circle_follow_start_time > circle_follow_duration:
-        circles = []
 
 
 
@@ -163,16 +176,15 @@ while True:
     
     
     for circle in circles:
-        circle_speed = 1  # Adjust the speed as needed
-        distance_x = player_x - circle.x
-        distance_y = player_y - circle.y
+        circle_speed = 2  # Adjust the speed as needed
+        distance_x = player_x + player_car_img.get_width() / 2 - circle.x
+        distance_y = player_y + player_car_img.get_height() / 2 - circle.y
         angle1 = math.atan2(distance_y, distance_x)
         circle.x += circle_speed * math.cos(angle1) 
         circle.y += circle_speed * math.sin(angle1) 
         
-        # Remove circles that go off-screen or have exceeded the warning duration
-        if circle.warning_start_time and time.time() - circle.warning_start_time > circle_warning_duration:
-            circles.remove(circle)
+        if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
+            circle.warning_start_time = elapsed_time
 
     
     
@@ -196,6 +208,7 @@ while True:
 
     # Draw circles
     for circle in circles:
+        circle_radius = circle.y / 5
         pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
 
 
