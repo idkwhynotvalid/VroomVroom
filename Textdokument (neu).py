@@ -66,17 +66,22 @@ class Circle:
         self.color = (255, 255, 255)
         self.warning_start_time = None
         
-        
-        
 
+
+#music
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+pygame.mixer.music.play(-1)
+    
+    
+# car sound import
 acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
 crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
 brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
 norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
 heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
 missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
-        
- 
+
+
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -128,7 +133,6 @@ game_over = False
 # Add variables to hold rotation angle and rotation speed
 angle = 0
 rotation_speed = 1
-
 
 # Game loop
 while True:
@@ -280,4 +284,6 @@ while True:
         sys.exit()
         
 #different speed for cars, 4 lanes. hallo
+        
+
 
