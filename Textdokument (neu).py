@@ -16,11 +16,12 @@ pygame.init()
 # Constants
 screen_info = pygame.display.Info()
 
-WIDTH, HEIGHT = 900, screen_info.current_h - 85
+HEIGHT = screen_info.current_h - 85
+WIDTH = HEIGHT/1000*1224
 FPS = 60
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
-NUM_LANES = 3
+NUM_LANES = 5
 
 
 class Car:
@@ -70,17 +71,17 @@ class Circle:
 
 
 #music
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-pygame.mixer.music.play(-1)
+#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+#pygame.mixer.music.play(-1)
     
     
 # car sound import
-acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
-crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
-brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
-norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
-heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
-missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+#acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+#crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+#brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+#norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+#heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+#missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
 
 
 
@@ -158,10 +159,10 @@ while True:
         
         
 
-        if keys[pygame.K_LEFT] and player_x >= 150:
+        if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*350:
             player_x -= 8
             angle += rotation_speed
-        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= 750:
+        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*350):
             player_x += 8
             angle -= rotation_speed
         if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
@@ -205,7 +206,7 @@ while True:
 
     for lane in range(NUM_LANES):
         if random.randint(0, 800) < 6:
-            x_position = random.choice([187.5 - 0.5 * enemy_car_img.get_width(), 362.5 - 0.5 * enemy_car_img.get_width(), 537.5 - 0.5 * enemy_car_img.get_width(), 712.5 - 0.5 * enemy_car_img.get_width()])
+            x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
             too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
             if not too_close:
                 speed = random.randint(1, 5)
