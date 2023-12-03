@@ -279,5 +279,5 @@ while True:
         pygame.quit()
         sys.exit()
         
-#different speed for cars, 4 lanes.
+#different speed for cars, 4 lanes. hallo
 
