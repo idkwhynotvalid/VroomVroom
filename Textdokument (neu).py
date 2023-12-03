@@ -68,6 +68,7 @@ class Circle:
         
 
 
+
 #music
 music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 pygame.mixer.music.play(-1)
@@ -82,6 +83,8 @@ heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
 missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
 
 
+
+ 
 
 class Helicopter:
     def __init__(self, x_position2):
