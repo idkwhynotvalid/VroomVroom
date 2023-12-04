@@ -16,3 +16,11 @@ car spawn. car movement.
 map movement
 menu
 
+3 weitere Autos
+Map design wichtig!!!!
+rocket explosion
+alarm circle 
+helicopter
+collision car car.
+collision rocket.
+
