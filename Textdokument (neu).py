@@ -71,8 +71,8 @@ class Circle:
 
 
 #music
-#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-#pygame.mixer.music.play(-1)
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+pygame.mixer.music.play(-1)
     
     
 # car sound import
