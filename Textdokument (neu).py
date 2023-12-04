@@ -70,9 +70,12 @@ class Circle:
 
 
 
+#background
+#background_image = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
+
 #music
-#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-#pygame.mixer.music.play(-1)
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+pygame.mixer.music.play(-1)
     
     
 # car sound import
@@ -205,7 +208,7 @@ while True:
 
 
     for lane in range(NUM_LANES):
-        if random.randint(0, 800) < 4:
+        if random.randint(0, 800) < 6:
             x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
             too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
             if not too_close:
