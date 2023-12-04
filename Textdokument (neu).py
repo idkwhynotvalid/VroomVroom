@@ -196,7 +196,7 @@ while True:
         # Move enemy cars and spawn new ones
     for car in enemy_cars:
         distance_to_bottom = HEIGHT - player_y
-        car.y += current_time ** 0.5 + car.speed + 0.01 * distance_to_bottom
+        car.y += (current_time ** 0.5) / 2 + car.speed + 0.01 * distance_to_bottom
         if car.y > HEIGHT:
             enemy_cars.remove(car)
 
@@ -205,7 +205,7 @@ while True:
 
 
     for lane in range(NUM_LANES):
-        if random.randint(0, 800) < 6:
+        if random.randint(0, 800) < 4:
             x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
             too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
             if not too_close:
