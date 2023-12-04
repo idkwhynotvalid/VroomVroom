@@ -79,16 +79,14 @@ pygame.mixer.music.play(-1)
     
     
 # car sound import
-#acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
-#crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
-#brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
-#norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
-#heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
-#missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
 
 
-
- 
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -165,13 +163,27 @@ while True:
         if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
             player_x -= 8
             angle += rotation_speed
+            
         if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
             player_x += 8
             angle -= rotation_speed
+            
         if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
             player_y -= 6
+            pygame.mixer.Sound.play(acc_sound)
+        if not keys[pygame.K_UP]:
+            pygame.mixer.Sound.stop(acc_sound)
+            
         if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
             player_y += 6
+            pygame.mixer.Sound.play(brake_sound)
+        if not keys[pygame.K_DOWN]:
+            pygame.mixer.Sound.stop(brake_sound)
+            
+        if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+            pygame.mixer.Sound.play(norm_sound)
+        if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
+            pygame.mixer.Sound.stop(norm_sound)
 
     
         
