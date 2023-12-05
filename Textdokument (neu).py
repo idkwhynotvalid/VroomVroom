@@ -55,6 +55,7 @@ def remove_expired_circles():
     for circle in circles.copy():
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
             circle.color = circle_color_warning
+            missile_sound.play()
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
             circles_to_remove.append(circle)
 
@@ -86,9 +87,7 @@ class Circle:
 
 
 
-#music
-#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-#pygame.mixer.music.play()
+
     
     
 # car sound import
@@ -126,7 +125,7 @@ x_position2 = WIDTH // 2 - helicopter_img.get_width() // 2
 y_position2 = HEIGHT - helicopter_img.get_height() -50
 
 # Load car images
-player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.jpg")).convert()
+player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.png")).convert()
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert()
 
 # Scale the car images
