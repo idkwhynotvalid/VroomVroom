@@ -130,7 +130,7 @@ player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "play
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert()
 
 # Scale the car images
-car_scale1 = 0.2
+car_scale1 = 0.1
 car_scale2 = 0.5
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
 enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
