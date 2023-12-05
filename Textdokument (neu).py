@@ -8,8 +8,9 @@ import time
 
 
 import time 
-from random import randrange 
+from random import randrange
 
+ 
 # Initialize Pygame
 pygame.init()
 
@@ -70,12 +71,11 @@ class Circle:
 
 
 
-#background
-#background_image = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
+
 
 #music
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-pygame.mixer.music.play(-1)
+#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+#pygame.mixer.music.play()
     
     
 # car sound import
@@ -85,8 +85,9 @@ brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
 norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
 heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
 missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
 
-
+music.play()
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -170,20 +171,20 @@ while True:
             
         if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
             player_y -= 6
-            pygame.mixer.Sound.play(acc_sound)
+            acc_sound.play()
         if not keys[pygame.K_UP]:
-            pygame.mixer.Sound.stop(acc_sound)
+            acc_sound.stop()
             
         if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
             player_y += 6
-            pygame.mixer.Sound.play(brake_sound)
+            brake_sound.play()
         if not keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.stop(brake_sound)
+            brake_sound.stop()
             
         if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.play(norm_sound)
+            norm_sound.play()
         if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.stop(norm_sound)
+            norm_sound.stop()
 
     
         
