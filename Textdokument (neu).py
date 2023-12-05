@@ -70,8 +70,7 @@ class Circle:
 
 
 
-#background
-#background_image = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
+
 
 #music
 music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
@@ -139,12 +138,40 @@ game_over = False
 angle = 0
 rotation_speed = 1
 
+
+#background
+background = pygame.image.load("background.jpg").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+# Load and scale your background image
+background = pygame.image.load("background.jpg").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+
+# Initialize the y position for the background
+background_y = 0
+speed3 = 10
+
+
 # Game loop
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+    
+    
+     # Scroll the background
+    background_y += speed3
+
+    # Ensure the background loops seamlessly
+    if background_y > 0:
+        background_y = -background.get_height() + (background_y % background.get_height())
+    
+    # Blit the background image to create the scrolling effect
+    screen.blit(background, (0, background_y))
+    screen.blit(background, (0, background_y + background.get_height()))
+             
+    
 
     keys = pygame.key.get_pressed()
     if not game_over:
@@ -248,8 +275,7 @@ while True:
     
     
     
-    # Draw background
-    screen.fill(BLACK)
+    # Draw car
     screen.blit(player_car_img, (player_x, player_y))
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
