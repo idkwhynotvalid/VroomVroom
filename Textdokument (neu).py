@@ -47,17 +47,29 @@ def spawn_circle():
     return time.time()
 
 def remove_expired_circles():
+    global game_over  # Ensure that the function can modify the global variable
+
+    circles_to_remove = []  # Create a list to store circles to be removed
+
     for circle in circles.copy():
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
-            circle.color = circle_color_warning    
+            circle.color = circle_color_warning
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
-            circles.remove(circle)
-            
+            circles_to_remove.append(circle)
+
+    # Check collisions after removing circles
+    for circle in circles_to_remove:
+        circles.remove(circle)
+        if is_collision(player_rect, circle):
+            game_over = True
+
+
+
 def is_collision(rect, circle):
     closest_x = max(rect.left, min(circle.x, rect.right))
     closest_y = max(rect.top, min(circle.y, rect.bottom))
     distance = math.sqrt((circle.x - closest_x) ** 2 + (circle.y - closest_y) ** 2)
-    return distance < circle.radius
+    return distance < circle.radius + player_car_img.get_width() / 2
 
 
 class Circle:
@@ -66,6 +78,7 @@ class Circle:
         self.y = HEIGHT - HEIGHT / 10
         self.color = (255, 255, 255)
         self.warning_start_time = None
+        self.radius = circle_radius
         
 
 
@@ -271,7 +284,6 @@ while True:
         
         if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
             circle.warning_start_time = elapsed_time
-
     
     
     
