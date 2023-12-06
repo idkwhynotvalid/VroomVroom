@@ -289,7 +289,6 @@ while True:
     
     
     # Draw car
-    screen.blit(player_car_img, (player_x, player_y))
     for car in enemy_cars:
         screen.blit(enemy_car_img, (car.x, car.y))
 
