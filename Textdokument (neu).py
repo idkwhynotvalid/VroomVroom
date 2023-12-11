@@ -10,6 +10,9 @@ import time
 import time 
 from random import randrange
 
+
+
+
  
 # Initialize Pygame
 pygame.init()
@@ -24,6 +27,17 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 NUM_LANES = 5
 
+# car sound import
+acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+
+
+
+music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
 
 class Car:
     def __init__(self, x_position, initial_speed):
@@ -82,22 +96,9 @@ class Circle:
         self.warning_start_time = None
         self.radius = circle_radius
         
-
-
-
-
-
-
     
     
-# car sound import
-acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
-crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
-brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
-norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
-heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
-missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
-music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
+
 
 music.play()
 
@@ -273,6 +274,7 @@ while True:
         enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
             game_over = True
+            
     
     
     for circle in circles:
