@@ -48,11 +48,13 @@ music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 #play music
 if folder == "me":
     pygame.mixer.music.set_volume(0.2)
+    heli_sound.set_volume(2)
 else:
     pygame.mixer.music.set_volume(0.7)
+    heli_sound.set_volume(1)
 
 pygame.mixer.music.play()
-
+pygame.mixer.Sound.play(heli_sound)
 
 class Car:
     def __init__(self, x_position, initial_speed):
@@ -109,21 +111,6 @@ class Circle:
 
 
 
-
-
-
-    
-
-# car sound import
-acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
-crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
-brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
-norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
-heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
-missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
-music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
-
-music.play()
 
 
 class Helicopter:
@@ -228,7 +215,7 @@ while True:
         if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
             player_x -= 8
             angle += rotation_speed
-            
+            pygame.mixer.Sound.play(norm_sound)
         if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
             player_x += 8
             angle -= rotation_speed
@@ -244,9 +231,9 @@ while True:
             pygame.mixer.Sound.play(brake_sound)
         if not keys[pygame.K_DOWN]:
 
-            brake_sound.stop()
+            pygame.mixer.Sound.stop(brake_sound)
         if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-            norm_sound.play()
+            pygame.mixer.Sound.play(norm_sound)
             if player_y < HEIGHT - HEIGHT / 5:
                 player_y += 2
 
@@ -299,6 +286,8 @@ while True:
     for car in enemy_cars:
         enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
+            crash_sound.volume_set(1000)
+            pygame.mixer.Sound.play(crash_sound)
             game_over = True
     
     
