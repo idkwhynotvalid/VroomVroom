@@ -247,7 +247,8 @@ while True:
             brake_sound.stop()
         if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
             norm_sound.play()
-            player_y += 2
+            if player_y < HEIGHT - HEIGHT / 5:
+                player_y += 2
 
         if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
             pygame.mixer.Sound.stop(norm_sound)
