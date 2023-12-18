@@ -48,13 +48,13 @@ music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 #play music
 if folder == "me":
     pygame.mixer.music.set_volume(0.2)
-    heli_sound.set_volume(2)
+    heli_sound.set_volume(5)
 else:
     pygame.mixer.music.set_volume(0.7)
     heli_sound.set_volume(1)
 
-pygame.mixer.music.play()
-pygame.mixer.Sound.play(heli_sound)
+#pygame.mixer.music.play()
+pygame.mixer.Sound.play(heli_sound, -1)
 
 class Car:
     def __init__(self, x_position, initial_speed):
@@ -286,8 +286,6 @@ while True:
     for car in enemy_cars:
         enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
-            crash_sound.volume_set(1000)
-            pygame.mixer.Sound.play(crash_sound)
             game_over = True
     
     
@@ -345,6 +343,7 @@ while True:
 
     # Game over screen
     if game_over:
+        pygame.mixer.quit()
         font = pygame.font.Font(None, 36)
         text = font.render("Game Over!", True, RED)
         text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
