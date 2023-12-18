@@ -44,8 +44,6 @@ missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp
 
 
 
-
-
 class Car:
     def __init__(self, x_position, initial_speed):
         self.x = x_position
@@ -222,20 +220,18 @@ while True:
         #music import
         music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
-        
-
-        # Calculate elapsed time
-        current_time = time.time() - start_time
-        if int(current_time) % 1 == 0:
-          score += 1/60
 
         
+               #play music
         if folder == "me":
-            pygame.mixer.music.set_volume(0.2)
+           pygame.mixer.music.set_volume(0.2)
+          heli_sound.set_volume(5)
         else:
-            pygame.mixer.music.set_volume(0.7)
+          pygame.mixer.music.set_volume(0.7)
+          heli_sound.set_volume(1)
 
         pygame.mixer.music.play()
+        pygame.mixer.Sound.play(heli_sound, -1)
     
         
          # Scroll the background
@@ -286,9 +282,9 @@ while True:
                 
             if not keys[pygame.K_DOWN]:
 
-                brake_sound.stop()
+                pygame.mixer.Sound.stop(brake_sound)
             if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                norm_sound.play()
+                pygame.mixer.Sound.play(norm_sound)
                 if player_y < HEIGHT - HEIGHT / 5:
                     player_y += 2
 
@@ -404,8 +400,11 @@ while True:
             pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
 
 
+        
+
 
         score2 = int(score)
+
         font = pygame.font.Font(None, 36)
         score_text = font.render(f"Score: {score2}", True, "WHITE")
         score_rect = score_text.get_rect(topright=(WIDTH - 10, 10))
@@ -415,6 +414,7 @@ while True:
 
         # Game over screen
         if game_over:
+            pygame.mixer.quit()
             font = pygame.font.Font(None, 36)
             text = font.render("Game Over!", True, RED)
             text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
