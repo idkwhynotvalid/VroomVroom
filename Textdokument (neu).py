@@ -10,7 +10,7 @@ import time
 import time 
 from random import randrange
 
- 
+
 # Initialize Pygame
 pygame.init()
 pygame.mixer.init()
@@ -297,16 +297,16 @@ while True:
 
 
             
-            
+        
         # Calculate elapsed time
         current_time = time.time() - start_time
         if int(current_time) % 1 == 0:
             score += 1/60
-            
-            
-            
-            
-      
+        
+        
+        
+        
+  
 
         elapsed_time += 1
         if int(elapsed_time) % (circle_spawn_interval * 60) == 0:
@@ -326,22 +326,22 @@ while True:
                 enemy_cars.remove(car)
 
 
-    desired_helicopter_x = player_x
-    x_position_difference = desired_helicopter_x - x_position2
-    helicopter_speed = 1
-    if abs(x_position_difference) > 1:
-        x_position2 += helicopter_speed * (x_position_difference / abs(x_position_difference))
+        desired_helicopter_x = player_x
+        x_position_difference = desired_helicopter_x - x_position2
+        helicopter_speed = 1
+        if abs(x_position_difference) > 1:
+            x_position2 += helicopter_speed * (x_position_difference / abs(x_position_difference))
 
 
-    y_position_difference = abs(player_y - y_position2)
+        y_position_difference = abs(player_y - y_position2)
 
-    swirl_amplitude = 10
-    swirl_frequency = 1.5
-    swirl_offset = swirl_amplitude * math.sin(swirl_frequency * pygame.time.get_ticks() / 1000)
-    x_position2_swirled = x_position2 + swirl_offset
-    helicopter_speed2 = 2
-    if abs(x_position2_swirled - x_position2) > 1:
-        x_position2 += helicopter_speed2 * ((x_position2_swirled - x_position2) / abs(x_position2_swirled - x_position2))
+        swirl_amplitude = 10
+        swirl_frequency = 1.5
+        swirl_offset = swirl_amplitude * math.sin(swirl_frequency * pygame.time.get_ticks() / 1000)
+        x_position2_swirled = x_position2 + swirl_offset
+        helicopter_speed2 = 2
+        if abs(x_position2_swirled - x_position2) > 1:
+            x_position2 += helicopter_speed2 * ((x_position2_swirled - x_position2) / abs(x_position2_swirled - x_position2))
 
 
 
@@ -360,11 +360,18 @@ while True:
             if player_rect.colliderect(enemy_rect):
                 game_over = True
         
+        
+        for circle in circles:
+            circle_speed = 2
+            distance_x = player_x + player_car_img.get_width() / 2 - circle.x
+            distance_y = player_y + player_car_img.get_height() / 2 - circle.y
+            angle1 = math.atan2(distance_y, distance_x)
+            circle.x += circle_speed * math.cos(angle1)
+            circle.y += circle_speed * math.sin(angle1)
 
-
-        if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
-            circle.warning_start_time = elapsed_time
-    
+            if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
+                circle.warning_start_time = elapsed_time
+        
     
     
         # Draw car
