@@ -23,17 +23,16 @@ WIDTH = HEIGHT/1000*1224
 FPS = 60
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GRAY = (169, 169, 169)
 NUM_LANES = 5
 
 
 folder = "compi"
-if int(input("hast du Humor? wenn ja dann drücke 1, sonst 0: ")) == 1:
-    folder = "me"
 
 #l = os.path.join("audio", folder, "auto gas.mp3")
 #l = r"inf audio\{ort}\auto gas.mp3".format(ort=folder)
 
-# car sound import
 acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
 crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
 brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
@@ -42,16 +41,9 @@ heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp
 missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
 
 
-#music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
-#play music
-if folder == "me":
-    pygame.mixer.music.set_volume(0.2)
-else:
-    pygame.mixer.music.set_volume(0.7)
 
-pygame.mixer.music.play()
+
 
 
 class Car:
@@ -109,23 +101,6 @@ class Circle:
 
 
 
-
-
-
-    
-
-# car sound import
-acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
-crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
-brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
-norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
-heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
-missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
-music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
-
-music.play()
-
-
 class Helicopter:
     def __init__(self, x_position2):
         self.x = x_position2
@@ -138,6 +113,8 @@ pygame.display.set_caption("3-Lane Car Highway Game")
 clock = pygame.time.Clock()
 score = 0
 
+#start_screen
+game_state = "start_screen"
 
 
 # Load helicopter image
@@ -190,6 +167,12 @@ background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 background_y = 0
 speed3 = 10
 
+# Font setup for start screen
+font = pygame.font.Font(None, 40)
+text_yes = font.render("Yes", True, WHITE)
+text_no = font.render("No", True, WHITE)
+text_question = font.render("Humor?", True, WHITE)
+
 
 # Game loop
 while True:
@@ -197,176 +180,225 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    
-    
-     # Scroll the background
-    background_y += speed3
-
-    # Ensure the background loops seamlessly
-    if background_y > 0:
-        background_y = -background.get_height() + (background_y % background.get_height())
-    
-    # Blit the background image to create the scrolling effect
-    screen.blit(background, (0, background_y))
-    screen.blit(background, (0, background_y + background.get_height()))
-             
-    
-
-    keys = pygame.key.get_pressed()
-    if not game_over:
-        if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
-            if angle >0:
-                angle -= 2*rotation_speed
-                if angle <=1 and angle >=-1:
-                    angle = 0
-            elif angle <0:
-                angle += 2*rotation_speed
-                if angle <= 1 and angle>=-1:
-                    angle = 0
-        
-
-        if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
-            player_x -= 8
-            angle += rotation_speed
             
-        if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
-            player_x += 8
-            angle -= rotation_speed
-            
-        if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
-            player_y -= 6
-            pygame.mixer.Sound.play(acc_sound)
-        if not keys[pygame.K_UP]:
-            pygame.mixer.Sound.fadeout(acc_sound, 250)
-            
-        if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
-            player_y += 6
-            pygame.mixer.Sound.play(brake_sound)
-        if not keys[pygame.K_DOWN]:
-
-            brake_sound.stop()
-        if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-            norm_sound.play()
-            if player_y < HEIGHT - HEIGHT / 5:
-                player_y += 2
-
-        if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.stop(norm_sound)
-
-
-        
-        
-    # Calculate elapsed time
-    current_time = time.time() - start_time
-    if int(current_time) % 1 == 0:
-        score += 1/60
-        
-        
-        
-        
-  
-
-    elapsed_time += 1
-    if int(elapsed_time) % (circle_spawn_interval * 60) == 0:
-        last_circle_spawn_time = spawn_circle()
-    remove_expired_circles()
-
-
-
-
-
-
-        # Move enemy cars and spawn new ones
-    for car in enemy_cars:
-        distance_to_bottom = HEIGHT - player_y
-        car.y += (current_time ** 0.5) / 2 + car.speed + 0.01 * distance_to_bottom
-        if car.y > HEIGHT:
-            enemy_cars.remove(car)
-
-
-
-
-
-    for lane in range(NUM_LANES):
-        if random.randint(0, 800) < 6:
-            x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
-            too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
-            if not too_close:
-                speed = random.randint(1, 5)
-                enemy_cars.append(Car(x_position, speed))
-
-    player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
-    for car in enemy_cars:
-        enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
-        if player_rect.colliderect(enemy_rect):
-            game_over = True
+    if game_state == "start_screen":
+        # Display start screen options and wait for user input
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if 300 <= mouse_pos[0] <= 500 and 300 <= mouse_pos[1] <= 350:
+                # Start the game if "Yes" is clicked
+                folder = "me"
+                game_state = "game_running"
+                print("Starting the game...")  # Replace with your game start code
+            elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
+                # Exit the game if "No" is clicked
+                game_state = "game_running"
     
-    
-    for circle in circles:
-        circle_speed = 2  # Adjust the speed as needed
-        distance_x = player_x + player_car_img.get_width() / 2 - circle.x
-        distance_y = player_y + player_car_img.get_height() / 2 - circle.y
-        angle1 = math.atan2(distance_y, distance_x)
-        circle.x += circle_speed * math.cos(angle1) 
-        circle.y += circle_speed * math.sin(angle1) 
-        
-        if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
-            circle.warning_start_time = elapsed_time
-    
-    
-    
-    # Draw car
-    for car in enemy_cars:
-        screen.blit(enemy_car_img, (car.x, car.y))
+        # Draw start screen elements
+        screen.fill(GRAY)
+        screen.blit(text_question, (WIDTH // 2 - text_question.get_width() // 2, 200))
+        pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
+        pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
+        screen.blit(text_yes, (350, 315))
+        screen.blit(text_no, (360, 415))
 
-    # Rotate the player car image
-    rotated_player_car = pygame.transform.rotate(player_car_img, angle)
-    rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
-    # Draw rotated player car
-    screen.blit(rotated_player_car, rotated_rect)
-
-    #Helicopter
-    rotated_helicopter = pygame.transform.rotate(helicopter_img, angle)
-    rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
-    # Draw rotated helicopter
-    screen.blit(rotated_helicopter, rotated_rect2)
-    
-    
-    
-    
-    # Draw enemy cars
-    for car in enemy_cars:
-        screen.blit(enemy_car_img, (car.x, car.y))
-
-
-    # Draw circles, To change
-    for circle in circles:
-        circle_radius = circle.y / 5
-        pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
-
-
-
-    score2 = int(score)
-    font = pygame.font.Font(None, 36)
-    score_text = font.render(f"Score: {score2}", True, "WHITE")
-    score_rect = score_text.get_rect(topright=(WIDTH - 10, 10))
-    screen.blit(score_text, score_rect)
-    pygame.display.flip()
-    clock.tick(FPS)
-
-    # Game over screen
-    if game_over:
-        font = pygame.font.Font(None, 36)
-        text = font.render("Game Over!", True, RED)
-        text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-            
-        screen.blit(text, text_rect)
         pygame.display.flip()
-
-        # Wait for a few seconds before quitting
-        pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
-        pygame.quit()
-        sys.exit()
+    
         
-#different speed for cars, 4 lanes. hallo
-#66, 50, 311. rayan to change
+        acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
+        crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
+        brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
+        norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3"))
+        heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
+        missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
+
+
+
+    elif game_state == "game_running":
+        
+        #music import
+        music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+
+        
+        
+        
+        if folder == "me":
+            pygame.mixer.music.set_volume(0.2)
+        else:
+            pygame.mixer.music.set_volume(0.7)
+
+        pygame.mixer.music.play()
+    
+        
+         # Scroll the background
+        background_y += speed3
+
+        # Ensure the background loops seamlessly
+        if background_y > 0:
+            background_y = -background.get_height() + (background_y % background.get_height())
+        
+        # Blit the background image to create the scrolling effect
+        screen.blit(background, (0, background_y))
+        screen.blit(background, (0, background_y + background.get_height()))
+                 
+        
+
+        keys = pygame.key.get_pressed()
+        if not game_over:
+            if not (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+                if angle >0:
+                    angle -= 2*rotation_speed
+                    if angle <=1 and angle >=-1:
+                        angle = 0
+                elif angle <0:
+                    angle += 2*rotation_speed
+                    if angle <= 1 and angle>=-1:
+                        angle = 0
+            
+
+            if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
+                player_x -= 8
+                angle += rotation_speed
+                
+            if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
+                player_x += 8
+                angle -= rotation_speed
+                
+            if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
+                player_y -= 6
+                pygame.mixer.Sound.play(acc_sound)
+            if not keys[pygame.K_UP]:
+                pygame.mixer.Sound.fadeout(acc_sound, 250)
+                
+            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
+                player_y += 6
+                pygame.mixer.Sound.play(brake_sound)
+                
+            if not keys[pygame.K_DOWN]:
+
+                brake_sound.stop()
+            if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                norm_sound.play()
+                if player_y < HEIGHT - HEIGHT / 5:
+                    player_y += 2
+
+            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
+                pygame.mixer.Sound.stop(norm_sound)
+
+
+            
+            
+        # Calculate elapsed time
+        current_time = time.time() - start_time
+        if int(current_time) % 1 == 0:
+            score += 1/60
+            
+            
+            
+            
+      
+
+        elapsed_time += 1
+        if int(elapsed_time) % (circle_spawn_interval * 60) == 0:
+            last_circle_spawn_time = spawn_circle()
+        remove_expired_circles()
+
+
+
+
+
+
+            # Move enemy cars and spawn new ones
+        for car in enemy_cars:
+            distance_to_bottom = HEIGHT - player_y
+            car.y += (current_time ** 0.5) / 2 + car.speed + 0.01 * distance_to_bottom
+            if car.y > HEIGHT:
+                enemy_cars.remove(car)
+
+
+
+
+
+        for lane in range(NUM_LANES):
+            if random.randint(0, 800) < 6:
+                x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
+                too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
+                if not too_close:
+                    speed = random.randint(1, 5)
+                    enemy_cars.append(Car(x_position, speed))
+
+        player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
+        for car in enemy_cars:
+            enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
+            if player_rect.colliderect(enemy_rect):
+                game_over = True
+        
+        
+        for circle in circles:
+            circle_speed = 2  # Adjust the speed as needed
+            distance_x = player_x + player_car_img.get_width() / 2 - circle.x
+            distance_y = player_y + player_car_img.get_height() / 2 - circle.y
+            angle1 = math.atan2(distance_y, distance_x)
+            circle.x += circle_speed * math.cos(angle1) 
+            circle.y += circle_speed * math.sin(angle1) 
+            
+            if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
+                circle.warning_start_time = elapsed_time
+        
+        
+        
+        # Draw car
+        for car in enemy_cars:
+            screen.blit(enemy_car_img, (car.x, car.y))
+
+        # Rotate the player car image
+        rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+        rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
+        # Draw rotated player car
+        screen.blit(rotated_player_car, rotated_rect)
+
+        #Helicopter
+        rotated_helicopter = pygame.transform.rotate(helicopter_img, angle)
+        rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
+        # Draw rotated helicopter
+        screen.blit(rotated_helicopter, rotated_rect2)
+        
+        
+        
+        
+        # Draw enemy cars
+        for car in enemy_cars:
+            screen.blit(enemy_car_img, (car.x, car.y))
+
+
+        # Draw circles, To change
+        for circle in circles:
+            circle_radius = circle.y / 5
+            pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
+
+
+
+        score2 = int(score)
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {score2}", True, "WHITE")
+        score_rect = score_text.get_rect(topright=(WIDTH - 10, 10))
+        screen.blit(score_text, score_rect)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+        # Game over screen
+        if game_over:
+            font = pygame.font.Font(None, 36)
+            text = font.render("Game Over!", True, RED)
+            text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                
+            screen.blit(text, text_rect)
+            pygame.display.flip()
+
+            # Wait for a few seconds before quitting
+            pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
+            pygame.quit()
+            sys.exit()
+            
+    #different speed for cars, 4 lanes. hallo
+    #66, 50, 311. rayan to change
