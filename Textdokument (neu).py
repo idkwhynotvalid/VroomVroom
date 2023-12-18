@@ -10,9 +10,6 @@ import time
 import time 
 from random import randrange
 
-
-
-
  
 # Initialize Pygame
 pygame.init()
@@ -27,6 +24,7 @@ FPS = 60
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 NUM_LANES = 5
+
 
 folder = "compi"
 if int(input("hast du Humor? wenn ja dann drücke 1, sonst 0: ")) == 1:
@@ -78,7 +76,7 @@ def spawn_circle():
     circles.append(circle)
     return time.time()
 
-def remove_expired_circles():
+def remove_expired_circles(): #To change
     global game_over  # Ensure that the function can modify the global variable
 
     circles_to_remove = []  # Create a list to store circles to be removed
@@ -87,22 +85,18 @@ def remove_expired_circles():
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
             circle.color = circle_color_warning
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
-            circles_to_remove.append(circle)
-
-    # Check collisions after removing circles
-    for circle in circles_to_remove:
-        circles.remove(circle)
-        if is_collision(player_rect, circle):
-            game_over = True
+            circles.remove(circle)
+            if is_collision(player_rect, circle):
+                game_over = True
 
 
 
-def is_collision(rect, circle):
-    closest_x = max(rect.left, min(circle.x, rect.right))
-    closest_y = max(rect.top, min(circle.y, rect.bottom))
-    distance = math.sqrt((circle.x - closest_x) ** 2 + (circle.y - closest_y) ** 2)
-    return distance < circle.radius + player_car_img.get_width() / 2
+def is_collision(rect, circle): #to change
+    rect_center_x = rect.x + rect.width / 2
+    rect_center_y = rect.y + rect.height / 2
 
+    distance = math.sqrt((rect_center_x - circle.x) ** 2 + (rect_center_y - circle.y) ** 2)
+    return distance < (circle.radius + max(rect.width, rect.height) / 2)
 
 class Circle:
     def __init__(self, player_x):
@@ -112,8 +106,25 @@ class Circle:
         self.warning_start_time = None
         self.radius = circle_radius
         
+
+
+
+
+
+
     
-    
+
+# car sound import
+acc_sound = pygame.mixer.Sound(r"inf audio\compi\auto gas.mp3")
+crash_sound = pygame.mixer.Sound(r"inf audio\compi\Auto crash.mp3")
+brake_sound = pygame.mixer.Sound(r"inf audio\compi\auto bremsen.mp3")
+norm_sound = pygame.mixer.Sound(r"inf audio\compi\auto norm.mp3")
+heli_sound = pygame.mixer.Sound(r"inf audio\compi\Helicopter.mp3")
+missile_sound = pygame.mixer.Sound(r"inf audio\compi\Missile.mp3")
+music = pygame.mixer.Sound(r"inf audio\DRIVE.mp3")
+
+music.play()
+
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -213,7 +224,6 @@ while True:
                 if angle <= 1 and angle>=-1:
                     angle = 0
         
-        
 
         if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
             player_x -= 8
@@ -233,14 +243,16 @@ while True:
             player_y += 6
             pygame.mixer.Sound.play(brake_sound)
         if not keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.stop(brake_sound)
-            
+
+            brake_sound.stop()
         if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-            pygame.mixer.Sound.play(norm_sound)
+            norm_sound.play()
+            player_y += 2
+
         if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
             pygame.mixer.Sound.stop(norm_sound)
 
-    
+
         
         
     # Calculate elapsed time
@@ -287,7 +299,6 @@ while True:
         enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
         if player_rect.colliderect(enemy_rect):
             game_over = True
-            
     
     
     for circle in circles:
@@ -327,10 +338,11 @@ while True:
         screen.blit(enemy_car_img, (car.x, car.y))
 
 
-    # Draw circles
+    # Draw circles, To change
     for circle in circles:
         circle_radius = circle.y / 5
         pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
+
 
 
     score2 = int(score)
@@ -356,3 +368,4 @@ while True:
         sys.exit()
         
 #different speed for cars, 4 lanes. hallo
+#66, 50, 311. rayan to change
