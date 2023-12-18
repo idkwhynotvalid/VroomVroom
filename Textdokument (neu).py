@@ -149,6 +149,8 @@ helicopter_img = pygame.transform.scale(helicopter_img, (int(helicopter_img.get_
 x_position2 = WIDTH // 2 - helicopter_img.get_width() // 2
 y_position2 = HEIGHT - helicopter_img.get_height() -50
 
+
+
 # Load car images
 player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.png")).convert_alpha()
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert_alpha()
@@ -163,7 +165,8 @@ enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_wid
 player_x = WIDTH // 2 - player_car_img.get_width() // 2
 
 player_y = HEIGHT - HEIGHT / 5
-
+#Helicopter x update
+desired_helicopter_x = player_x
 # Initialize enemy cars
 enemy_cars = []
 #circles
@@ -255,7 +258,6 @@ while True:
 
 
         
-        
     # Calculate elapsed time
     current_time = time.time() - start_time
     if int(current_time) % 1 == 0:
@@ -263,7 +265,7 @@ while True:
         
         
         
-        
+
   
 
     elapsed_time += 1
@@ -283,6 +285,23 @@ while True:
         if car.y > HEIGHT:
             enemy_cars.remove(car)
 
+
+    desired_helicopter_x = player_x
+    x_position_difference = desired_helicopter_x - x_position2
+    helicopter_speed = 1
+    if abs(x_position_difference) > 1:
+        x_position2 += helicopter_speed * (x_position_difference / abs(x_position_difference))
+
+
+    y_position_difference = abs(player_y - y_position2)
+
+    swirl_amplitude = 10
+    swirl_frequency = 1.5
+    swirl_offset = swirl_amplitude * math.sin(swirl_frequency * pygame.time.get_ticks() / 1000)
+    x_position2_swirled = x_position2 + swirl_offset
+    helicopter_speed2 = 2
+    if abs(x_position2_swirled - x_position2) > 1:
+        x_position2 += helicopter_speed2 * ((x_position2_swirled - x_position2) / abs(x_position2_swirled - x_position2))
 
 
 
@@ -328,7 +347,6 @@ while True:
     #Helicopter
     rotated_helicopter = pygame.transform.rotate(helicopter_img, angle)
     rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
-    # Draw rotated helicopter
     screen.blit(rotated_helicopter, rotated_rect2)
     
     
