@@ -174,6 +174,8 @@ text_yes = font.render("Yes", True, WHITE)
 text_no = font.render("No", True, WHITE)
 text_question = font.render("Humor?", True, WHITE)
 
+        #music import
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 # Game loop
 while True:
@@ -213,25 +215,21 @@ while True:
         heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
         missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
 
-        #music import
-        music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
-
-    elif game_state == "game_running":
-        
-        
-
-
-        
-               #play music
         if folder == "me":
             
-            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.music.set_volume(0.5)
             heli_sound.set_volume(5)
         else:
             pygame.mixer.music.set_volume(0.7)
             heli_sound.set_volume(0.5)
+        #play music
+       
 
         pygame.mixer.music.play()
+
+    elif game_state == "game_running":
+        
+        
         pygame.mixer.Sound.play(heli_sound, -1)
     
         
