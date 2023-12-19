@@ -166,13 +166,13 @@ background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # Initialize the y position for the background
 background_y = 0
-speed3 = 10
+speed3 = 15
 
 # Font setup for start screen
 font = pygame.font.Font(None, 40)
-text_yes = font.render("Yes", True, WHITE)
-text_no = font.render("No", True, WHITE)
-text_question = font.render("Humor?", True, WHITE)
+text_yes = font.render("Yes", True, BLACK)
+text_no = font.render("No", True, BLACK)
+text_question = font.render("Humor?", True, BLACK)
 
         #music import
 music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
@@ -189,12 +189,11 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             if 300 <= mouse_pos[0] <= 500 and 300 <= mouse_pos[1] <= 350:
-                # Start the game if "Yes" is clicked
+                # Mattia sound if yes
                 folder = "me"
                 game_state = "game_running"
                 print("Starting the game...")  # Replace with your game start code
             elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
-                # Exit the game if "No" is clicked
                 game_state = "game_running"
     
         # Draw start screen elements
