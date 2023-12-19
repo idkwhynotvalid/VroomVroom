@@ -128,7 +128,9 @@ y_position2 = HEIGHT - helicopter_img.get_height() -50
 
 # Load car images
 player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.png")).convert_alpha()
+
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.jpg")).convert_alpha()
+
 
 # Scale the car images
 car_scale1 = 0.1
@@ -351,13 +353,15 @@ while True:
                 if not too_close:
                     speed = random.randint(1, 8)
                     enemy_cars.append(Car(x_position, speed))
-
-        player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
+        rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+        player_mask = pygame.mask.from_surface(rotated_player_car)
         for car in enemy_cars:
-            enemy_rect = pygame.Rect(car.x, car.y, enemy_car_img.get_width(), enemy_car_img.get_height())
-            if player_rect.colliderect(enemy_rect):
+            enemy_mask = pygame.mask.from_surface(enemy_car_img)  # Assuming enemy_car has an 'image' attribute
+            offset = (car.x - player_x, car.y - player_y)
+            
+            if player_mask.overlap(enemy_mask, offset):
                 game_over = True
-        
+        #collision check between player and car.
         
         for circle in circles:
             circle_speed = 2
@@ -376,8 +380,6 @@ while True:
         for car in enemy_cars:
             screen.blit(enemy_car_img, (car.x, car.y))
 
-        # Rotate the player car image
-        rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
         # Draw rotated player car
         screen.blit(rotated_player_car, rotated_rect)
