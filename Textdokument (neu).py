@@ -315,7 +315,7 @@ while True:
             # Move enemy cars and spawn new ones
         for car in enemy_cars:
             distance_to_bottom = HEIGHT - player_y
-            car.y += (current_time ** 0.5) / 2 + car.speed + 0.01 * distance_to_bottom
+            car.y += (current_time ** 0.5) / 2 + car.speed + 0.02 * distance_to_bottom
             if car.y > HEIGHT:
                 enemy_cars.remove(car)
 
@@ -334,6 +334,7 @@ while True:
         swirl_offset = swirl_amplitude * math.sin(swirl_frequency * pygame.time.get_ticks() / 1000)
         x_position2_swirled = x_position2 + swirl_offset
         helicopter_speed2 = 2
+        x_position_hel_car = abs(x_position2_swirled - x_position2)
         if abs(x_position2_swirled - x_position2) > 1:
             x_position2 += helicopter_speed2 * ((x_position2_swirled - x_position2) / abs(x_position2_swirled - x_position2))
 
@@ -345,7 +346,7 @@ while True:
                 x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
                 too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
                 if not too_close:
-                    speed = random.randint(1, 5)
+                    speed = random.randint(1, 8)
                     enemy_cars.append(Car(x_position, speed))
 
         player_rect = pygame.Rect(player_x, player_y, player_car_img.get_width(), player_car_img.get_height())
