@@ -76,8 +76,6 @@ def remove_expired_circles(): #To change
             circle.color = circle_color_warning
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
             circles.remove(circle)
-            if is_collision(player_rect, circle):
-                game_over = True
 
 
 
@@ -263,11 +261,9 @@ while True:
             
 
             if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
-                player_x -= 8
                 angle += rotation_speed
                 
             if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
-                player_x += 8
                 angle -= rotation_speed
                 
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
@@ -290,9 +286,11 @@ while True:
 
             if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
                 pygame.mixer.Sound.stop(norm_sound)
-
-
             
+            player_x -= angle * 0.5
+            
+            if player_x <= WIDTH/1224*375 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*375):
+                game_over = True
         
         # Calculate elapsed time
         current_time = time.time() - start_time
