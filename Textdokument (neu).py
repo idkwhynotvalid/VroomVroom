@@ -287,7 +287,7 @@ while True:
             if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
                 pygame.mixer.Sound.stop(norm_sound)
             
-            player_x -= angle * 0.5
+            player_x -= angle * 0.7
             
             if player_x <= WIDTH/1224*375 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*375):
                 game_over = True
