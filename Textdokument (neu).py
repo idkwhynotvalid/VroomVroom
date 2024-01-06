@@ -41,7 +41,10 @@ heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp
 missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
 
 
-
+class Helicopter:
+    def __init__(self, x_position2):
+        self.x = x_position2
+        self.y = y_position2
 
 
 class Car:
@@ -49,6 +52,19 @@ class Car:
         self.x = x_position
         self.y = -player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
+
+class Circle:
+    def __init__(self, player_x):
+        self.x = player_x
+        self.y = HEIGHT - HEIGHT / 10
+        self.spawn_time = time.time()  # Track when the circle is spawned
+        self.lifespan = circle_spawn_interval  # Set lifespan for each circle
+        self.warning_start_time = None
+        self.explosion_triggered = False
+        self.explosion_x = player_x
+        self.explosion_y = None
+        self.explosion_set = False
+        self.show_warning = False
 
 
 circle_radius = 0
@@ -61,6 +77,7 @@ circle_warning_duration = 2  # in seconds6
 elapsed_time = 0 
 last_circle_spawn_time = 0
 checkingsth = True
+distance_to_bottom = 0
 
 
 
@@ -90,10 +107,11 @@ def remove_expired_circles():
 
         # Check if it's time to show the explosion circle
         if time_since_spawn >= circle_follow + circle_warning_duration:
+            is_collision()
             circle.show_warning = False
             circle.explosion_triggered = True
             if not circle.explosion_set:
-                circle.explosion_y = circle.y
+                circle.explosion_y = circle.y - 20*speed3
                 circle.explosion_set = True  # Mark that explosion position is set     
 
 
@@ -110,30 +128,18 @@ def remove_expired_circles():
 
 
 
-def is_collision(rect, circle): #to change
-    rect_center_x = rect.x + rect.width / 2
-    rect_center_y = rect.y + rect.height / 2
+def is_collision(): 
+    global game_over
+    player_mask = pygame.mask.from_surface(rotated_player_car)
+    circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
+    offset = (circle.x - player_x, circle.y - player_y)
+    
+    if player_mask.overlap(circle_mask, offset):
+        game_over = True
 
-    distance = math.sqrt((rect_center_x - circle.x) ** 2 + (rect_center_y - circle.y) ** 2)
-    return distance < (circle.radius + max(rect.width, rect.height) / 2)
 
-class Circle:
-    def __init__(self, player_x):
-        self.x = player_x
-        self.y = HEIGHT - HEIGHT / 10
-        self.spawn_time = time.time()  # Track when the circle is spawned
-        self.lifespan = circle_spawn_interval  # Set lifespan for each circle
-        self.warning_start_time = None
-        self.explosion_triggered = False
-        self.explosion_x = player_x
-        self.explosion_y = None
-        self.explosion_set = False
-        self.show_warning = False
 
-class Helicopter:
-    def __init__(self, x_position2):
-        self.x = x_position2
-        self.y = y_position2
+
 
 
 # Create the game window
@@ -256,7 +262,7 @@ while True:
         if folder == "me":
             
             pygame.mixer.music.set_volume(0.5)
-            heli_sound.set_volume(5)
+            heli_sound.set_volume(2)
         else:
             pygame.mixer.music.set_volume(0.7)
             heli_sound.set_volume(0.5)
@@ -272,7 +278,7 @@ while True:
     
         
          # Scroll the background
-        background_y += speed3
+        background_y += speed3 + 0.02 * distance_to_bottom
 
 
         # Ensure the background loops seamlessly
@@ -353,10 +359,9 @@ while True:
 
 
 
-
+        distance_to_bottom = HEIGHT - player_y
             # Move enemy cars and spawn new ones
         for car in enemy_cars:
-            distance_to_bottom = HEIGHT - player_y
             car.y += (2*current_time ** 0.5) / 2 + car.speed + 0.02 * distance_to_bottom
             if car.y > HEIGHT:
                 enemy_cars.remove(car)
