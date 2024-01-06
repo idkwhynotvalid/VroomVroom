@@ -54,7 +54,7 @@ class Car:
 circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
-circle_spawn_interval = 9  # in seconds#20
+circle_spawn_interval = 13  # in seconds#20
 circle_follow = 3 #8
 circle_wait = 8 #12
 circle_warning_duration = 2  # in seconds6
@@ -85,18 +85,18 @@ def remove_expired_circles():
         if time_since_spawn >= circle_follow:
             checkingsth = False
             circle.warning_start_time = current_time
-            circle_x = int(circle.x - warn_img.get_width()/2)  
-            circle_y = int(circle.y - warn_img.get_height()/2) 
-            screen.blit(warn_img, (circle_x, circle_y))
+            circle.show_warning = True
+      
 
         # Check if it's time to show the explosion circle
         if time_since_spawn >= circle_follow + circle_warning_duration:
+            circle.show_warning = False
             circle.explosion_triggered = True
             if not circle.explosion_set:
                 circle.explosion_y = circle.y
                 circle.explosion_set = True  # Mark that explosion position is set     
-            circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
-            screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))
+
+
 
 
 
@@ -128,6 +128,7 @@ class Circle:
         self.explosion_x = player_x
         self.explosion_y = None
         self.explosion_set = False
+        self.show_warning = False
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -356,7 +357,7 @@ while True:
             # Move enemy cars and spawn new ones
         for car in enemy_cars:
             distance_to_bottom = HEIGHT - player_y
-            car.y += (current_time ** 0.5) / 2 + car.speed + 0.02 * distance_to_bottom
+            car.y += (2*current_time ** 0.5) / 2 + car.speed + 0.02 * distance_to_bottom
             if car.y > HEIGHT:
                 enemy_cars.remove(car)
 
@@ -443,7 +444,15 @@ while True:
                 circle.explosion_y += speed3
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
-            
+            if circle.show_warning:
+                circle_x = int(circle.x - warn_img.get_width()/2)
+                circle_y = int(circle.y - warn_img.get_height()/2)
+                screen.blit(warn_img, (circle_x, circle_y))
+
+            # Draw the explosion circle
+            if circle.explosion_triggered:
+                circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
+                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
   
 
 
