@@ -54,8 +54,9 @@ class Car:
 circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
-circle_spawn_interval = 20  # in seconds
+circle_spawn_interval = 14  # in seconds
 circle_follow = 8
+circle_wait = 12
 circle_warning_duration = 6  # in seconds
 elapsed_time = 0 
 last_circle_spawn_time = 0
@@ -70,11 +71,23 @@ def remove_expired_circles(): #To change
     global game_over  # Ensure that the function can modify the global variable
 
     circles_to_remove = []  # Create a list to store circles to be removed
-
+    previous_circle_positions = []
     for circle in circles.copy():
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
-            circle.color = circle_color_warning
+            # Clear the previous blit
+            for pos in previous_circle_positions:
+                screen.blit(background, pos, pos + (circle_radius * 2, circle_radius * 2))
+            # Store the current position for the next frame
+            previous_circle_positions.append((int(circle.x - circle_radius), int(circle.y - circle_radius)))
+            screen.blit(warn_img, (circle_x, circle_y))
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
+            # Clear the previous blit
+            for pos in previous_circle_positions:
+                screen.blit(background, pos, pos + (circle_radius * 2, circle_radius * 2))
+            # Store the current position for the next frame
+            previous_circle_positions.append((int(circle.x - circle_radius), int(circle.y - circle_radius)))
+            screen.blit(explosion_img, (circle_x, circle_y))
+        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_wait:
             circles.remove(circle)
 
 
@@ -90,9 +103,8 @@ class Circle:
     def __init__(self, player_x):
         self.x = player_x
         self.y = HEIGHT - HEIGHT / 10
-        self.color = (255, 255, 255)
         self.warning_start_time = None
-        self.radius = circle_radius
+
         
 
 
@@ -129,6 +141,11 @@ player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "play
 
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.png")).convert_alpha()
 
+circle_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "warning.png")).convert_alpha()
+
+explosion_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "explo.png")).convert_alpha()
+
+warn_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "3818227.png")).convert_alpha()
 
 # Scale the car images
 car_scale1 = 0.1
@@ -260,10 +277,10 @@ while True:
                         angle = 0
             
 
-            if keys[pygame.K_LEFT] and player_x >= WIDTH/1224*375:
+            if keys[pygame.K_LEFT]: #if player_x <= WIDTH/1224*300 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*300)
                 angle += rotation_speed
                 
-            if keys[pygame.K_RIGHT] and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375):
+            if keys[pygame.K_RIGHT]: #and player_x + enemy_car_img.get_width() <= WIDTH-(WIDTH/1224*375)
                 angle -= rotation_speed
                 
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
@@ -289,13 +306,15 @@ while True:
             
             player_x -= angle * 0.7
             
-            if player_x <= WIDTH/1224*375 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*375):
+            if player_x <= WIDTH/1224*350 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
                 game_over = True
         
         # Calculate elapsed time
         current_time = time.time() - start_time
         if int(current_time) % 1 == 0:
             score += 1/60
+
+
         
         
         
@@ -394,9 +413,12 @@ while True:
 
 
         # Draw circles, To change
+        # Draw circles
         for circle in circles:
-            circle_radius = circle.y / 5
-            pygame.draw.circle(screen, circle.color, (int(circle.x), int(circle.y)), circle_radius)
+            circle_x = int(circle.x - circle_img.get_width()/2)  
+            circle_y = int(circle.y - circle_img.get_height()/2) 
+            screen.blit(circle_img, (circle_x, circle_y))
+
 
 
         
