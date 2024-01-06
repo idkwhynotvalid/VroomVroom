@@ -1,47 +1,40 @@
 import pygame
-import random
-import sys
 import os
-import math
 
-pygame.init()
+def rotate(circle_img, rect, angle):
+    """Rotate the image while keeping its center."""
+    new_circle_img = pygame.transform.rotate(circle_img, angle)
+    rect = new_circle_img.get_rect(center=rect.center)
+    return new_circle_img, rect
 
-#define screen size
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 1000
+def initialize():
+    pygame.init()
+    return pygame.display.set_mode((640, 480)), pygame.Color('gray15')
 
-#create game window
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Masks")
+def main():
+    clock = pygame.time.Clock()
+    screen, gray = initialize()
 
-#define colours
-BG = (0, 0, 0)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-WHITE = (255, 255, 255)
+    circle_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "warning.png")).convert_alpha()
+    orig_circle_img = circle_img
 
-#create car 
-soldier = pygame.image.load("player_car.png").convert_alpha()
-soldier_rect = soldier.get_rect()
-soldier_mask = pygame.mask.from_surface(soldier)
-mask_image = soldier_mask.to_surface()
+    rect = circle_img.get_rect(center=(94, 94))
+    angle = 0
 
-#game loop
-run = True
-while run:
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
 
-  #update background
-  screen.fill(BG)
-  
-  screen.blit(mask_image, (0,0))
+        angle += 2
+        rotated_circle_img, rect = rotate(orig_circle_img, rect, angle)
 
-  #event handler
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      run = False
+        screen.fill(gray)
+        screen.blit(rotated_circle_img, rect)
+        pygame.display.flip()
+        clock.tick(30)
 
-  #update display
-  pygame.display.flip()
-
-pygame.quit()
+if __name__ == '__main__':
+    main()
+    pygame.quit()
