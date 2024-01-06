@@ -54,10 +54,10 @@ class Car:
 circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
-circle_spawn_interval = 14  # in seconds
-circle_follow = 8
-circle_wait = 12
-circle_warning_duration = 6  # in seconds
+circle_spawn_interval = 6  # in seconds#20
+circle_follow = 3 #8
+circle_wait = 5 #12
+circle_warning_duration = 2  # in seconds6
 elapsed_time = 0 
 last_circle_spawn_time = 0
 
@@ -86,7 +86,7 @@ def remove_expired_circles(): #To change
                 screen.blit(background, pos, pos + (circle_radius * 2, circle_radius * 2))
             # Store the current position for the next frame
             previous_circle_positions.append((int(circle.x - circle_radius), int(circle.y - circle_radius)))
-            screen.blit(explosion_img, (circle_x, circle_y))
+            screen.blit(explosion_img, (circle_x, circle_y2))
         if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_wait:
             circles.remove(circle)
 
@@ -183,6 +183,7 @@ background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # Initialize the y position for the background
 background_y = 0
+circle_y2 = 0
 speed3 = 15
 
 # Font setup for start screen
@@ -251,6 +252,7 @@ while True:
         
          # Scroll the background
         background_y += speed3
+
 
         # Ensure the background loops seamlessly
         if background_y > 0:
@@ -418,7 +420,9 @@ while True:
             circle_x = int(circle.x - circle_img.get_width()/2)  
             circle_y = int(circle.y - circle_img.get_height()/2) 
             screen.blit(circle_img, (circle_x, circle_y))
-
+            circle_y2 = circle.y
+            
+  
 
 
         
