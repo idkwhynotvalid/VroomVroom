@@ -54,12 +54,14 @@ class Car:
 circle_radius = 0
 circle_color_normal = (0, 255, 0)  # Green
 circle_color_warning = (255, 0, 0)  # Red
-circle_spawn_interval = 14  # in seconds
-circle_follow = 8
-circle_wait = 12
-circle_warning_duration = 6  # in seconds
+circle_spawn_interval = 9  # in seconds#20
+circle_follow = 3 #8
+circle_wait = 8 #12
+circle_warning_duration = 2  # in seconds6
 elapsed_time = 0 
 last_circle_spawn_time = 0
+checkingsth = True
+
 
 
 def spawn_circle():
@@ -67,28 +69,44 @@ def spawn_circle():
     circles.append(circle)
     return time.time()
 
-def remove_expired_circles(): #To change
-    global game_over  # Ensure that the function can modify the global variable
+def remove_expired_circles():
+    global game_over
+    global checkingsth
+    current_time = time.time()
 
-    circles_to_remove = []  # Create a list to store circles to be removed
-    previous_circle_positions = []
     for circle in circles.copy():
-        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_warning_duration:
-            # Clear the previous blit
-            for pos in previous_circle_positions:
-                screen.blit(background, pos, pos + (circle_radius * 2, circle_radius * 2))
-            # Store the current position for the next frame
-            previous_circle_positions.append((int(circle.x - circle_radius), int(circle.y - circle_radius)))
+        # Calculate the elapsed time since the circle was spawned
+        time_since_spawn = int(current_time - circle.spawn_time)
+
+
+
+
+        # Check if it's time to show the warning circle
+        if time_since_spawn >= circle_follow:
+            checkingsth = False
+            circle.warning_start_time = current_time
+            circle_x = int(circle.x - warn_img.get_width()/2)  
+            circle_y = int(circle.y - warn_img.get_height()/2) 
             screen.blit(warn_img, (circle_x, circle_y))
-        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_follow:
-            # Clear the previous blit
-            for pos in previous_circle_positions:
-                screen.blit(background, pos, pos + (circle_radius * 2, circle_radius * 2))
-            # Store the current position for the next frame
-            previous_circle_positions.append((int(circle.x - circle_radius), int(circle.y - circle_radius)))
-            screen.blit(explosion_img, (circle_x, circle_y))
-        if circle.warning_start_time is not None and elapsed_time / FPS - circle.warning_start_time / FPS >= circle_wait:
+
+        # Check if it's time to show the explosion circle
+        if time_since_spawn >= circle_follow + circle_warning_duration:
+            circle.explosion_triggered = True
+            if not circle.explosion_set:
+                circle.explosion_y = circle.y
+                circle.explosion_set = True  # Mark that explosion position is set     
+            circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
+            screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))
+
+
+
+
+        # Check if the circle has exceeded its lifespan and should be removed
+        if time_since_spawn >= circle_wait:
             circles.remove(circle)
+            checkingsth = True
+            circle.explosion_set = False
+
 
 
 
@@ -103,11 +121,13 @@ class Circle:
     def __init__(self, player_x):
         self.x = player_x
         self.y = HEIGHT - HEIGHT / 10
+        self.spawn_time = time.time()  # Track when the circle is spawned
+        self.lifespan = circle_spawn_interval  # Set lifespan for each circle
         self.warning_start_time = None
-
-        
-
-
+        self.explosion_triggered = False
+        self.explosion_x = player_x
+        self.explosion_y = None
+        self.explosion_set = False
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -183,6 +203,7 @@ background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 # Initialize the y position for the background
 background_y = 0
+circle_y2 = 0
 speed3 = 15
 
 # Font setup for start screen
@@ -251,6 +272,7 @@ while True:
         
          # Scroll the background
         background_y += speed3
+
 
         # Ensure the background loops seamlessly
         if background_y > 0:
@@ -417,8 +439,12 @@ while True:
         for circle in circles:
             circle_x = int(circle.x - circle_img.get_width()/2)  
             circle_y = int(circle.y - circle_img.get_height()/2) 
-            screen.blit(circle_img, (circle_x, circle_y))
-
+            if circle.explosion_triggered:
+                circle.explosion_y += speed3
+            if checkingsth == True:
+                screen.blit(circle_img, (circle_x, circle_y))
+            
+  
 
 
         
