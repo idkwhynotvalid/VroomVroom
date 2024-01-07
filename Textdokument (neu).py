@@ -215,7 +215,7 @@ def is_collision():
         if player_mask.overlap(warn_mask, offset):
             game_over = True
 
-def will_collide(new_car, existing_cars, lookahead=2000):
+def will_collide(new_car, existing_cars, lookahead=5000):
     new_car_bottom = new_car.bottom()
 
     for car in existing_cars:
@@ -254,7 +254,7 @@ def remove_overlapping_cars(cars):
         cars.remove(car)
 
 
-prox = 50  # Adjust this value as needed
+prox = 110  # Adjust this value as needed
 
 def is_overlapping(car1, car2):
 
