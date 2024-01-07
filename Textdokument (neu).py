@@ -78,6 +78,7 @@ elapsed_time = 0
 last_circle_spawn_time = 0
 checkingsth = True
 distance_to_bottom = 0
+collision_check_enabled = True
 
 
 
@@ -131,11 +132,13 @@ def remove_expired_circles():
 def is_collision(): 
     global game_over
     player_mask = pygame.mask.from_surface(rotated_player_car)
-    circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
-    offset = (circle.x - player_x, circle.y - player_y)
+    warn_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
+    offset = (int(circle.x - player_x - warn_img.get_width() / 2), int(circle.y - player_y - warn_img.get_height() / 2))
+
     
-    if player_mask.overlap(circle_mask, offset):
-        return
+    if collision_check_enabled:
+        if player_mask.overlap(warn_mask, offset):
+            game_over = True
 
 
 #startscreen background setup
@@ -280,7 +283,7 @@ while True:
     
         
          # Scroll the background
-        background_y += speed3 + 0.02 * distance_to_bottom
+        
 
 
         # Ensure the background loops seamlessly
@@ -345,6 +348,7 @@ while True:
         if int(current_time) % 1 == 0:
             score += 1/60
 
+        background_y += speed3 + 0.01 * distance_to_bottom + 0.3*current_time
 
         
         
@@ -361,10 +365,10 @@ while True:
 
 
 
-        distance_to_bottom = HEIGHT - player_y
+        distance_to_bottom = HEIGHT - player_y / 1.4
             # Move enemy cars and spawn new ones
         for car in enemy_cars:
-            car.y += (2*current_time ** 0.5) / 2 + car.speed + 0.02 * distance_to_bottom
+            car.y += (0.3*current_time) + car.speed + 0.01 * distance_to_bottom
             if car.y > HEIGHT:
                 enemy_cars.remove(car)
 
@@ -395,7 +399,7 @@ while True:
                 x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
                 too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
                 if not too_close:
-                    speed = random.randint(1, 8)
+                    speed = random.randint(1, 6)
                     enemy_cars.append(Car(x_position, speed))
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
@@ -449,9 +453,11 @@ while True:
             circle_y = int(circle.y - circle_img.get_height()/2) 
             if circle.explosion_triggered:
                 circle.explosion_y += speed3
+                collision_check_enabled = False
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
             if circle.show_warning:
+                collision_check_enabled = True
                 circle_x = int(circle.x - warn_img.get_width()/2)
                 circle_y = int(circle.y - warn_img.get_height()/2)
                 screen.blit(warn_img, (circle_x, circle_y))
