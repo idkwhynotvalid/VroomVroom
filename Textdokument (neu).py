@@ -33,12 +33,24 @@ folder = "compi"
 #l = os.path.join("audio", folder, "auto gas.mp3")
 #l = r"inf audio\{ort}\auto gas.mp3".format(ort=folder)
 
-acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
-crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
-brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
-norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3"))
-heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
-missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
+#import sound
+acc_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto gas.mp3"))
+crash_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Auto crash.mp3"))
+brake_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto bremsen.mp3"))
+norm_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto norm.mp3"))
+heli_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Helicopter.mp3"))
+missile_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Missile.mp3"))
+
+#import human sound
+acc_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto gas.mp3"))
+crash_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Auto crash.mp3"))
+brake_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto bremsen.mp3"))
+norm_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto norm.mp3"))
+heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.mp3"))
+missile_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Missile.mp3"))
+
+        #music import
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 class background_load (pygame.sprite.Sprite):
     def __innit__(self, pos_x, pos_y):
@@ -65,6 +77,7 @@ class background_load (pygame.sprite.Sprite):
         self.image = self.sprites[self.current_sprite]
     
 
+
 class Helicopter:
     def __init__(self, x_position2):
         self.x = x_position2
@@ -72,11 +85,14 @@ class Helicopter:
 
 
 class Car:
-    def __init__(self, x_position, initial_speed, image):
+    def __init__(self, x_position, y_position, speed, image):
         self.x = x_position
-        self.y = 2*-player_car_img.get_height() # Start above the screen
-        self.speed = initial_speed
+        self.y = y_position
+        self.speed = speed
         self.image = image
+
+    def bottom(self):
+        return self.y + self.image.get_height()
 
 
 class Circle:
@@ -87,7 +103,6 @@ class Circle:
         self.lifespan = circle_spawn_interval  # Set lifespan for each circle
         self.warning_start_time = None
         self.explosion_triggered = False
-        self.explosion_x = player_x
         self.explosion_y = None
         self.explosion_set = False
         self.show_warning = False
@@ -158,16 +173,66 @@ def remove_expired_circles():
 def is_collision(): 
     global game_over
     player_mask = pygame.mask.from_surface(rotated_player_car)
+
+    circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
+    offset = (circle.x - player_x, circle.y - player_y)
+    
+    #if player_mask.overlap(circle_mask, offset):
+#        game_over = True
+#       print("hallo")
+
     warn_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
     offset = (int(circle.x - player_x - warn_img.get_width() / 2), int(circle.y - player_y - warn_img.get_height() / 2))
+
 
     
     if collision_check_enabled:
         if player_mask.overlap(warn_mask, offset):
             game_over = True
 
+def will_collide(new_car, existing_cars, lookahead=900):
+    new_car_bottom = new_car.bottom()
 
-#startscreen background setup
+    for car in existing_cars:
+        if car.x == new_car.x:  # Same lane
+            car_bottom = car.bottom()
+
+            # Initial overlap check at spawn
+            if not (new_car_bottom < car.y or new_car.y > car_bottom):
+                return True
+
+            # Future collision check based on speed differences
+            if new_car.speed > car.speed:
+                # Distance needed for the new car to reach the bottom of the car in front
+                distance_to_reach_car_front = car.y - new_car_bottom
+
+                # Predicted time for the new car to reach this distance
+                time_to_reach_car_front = distance_to_reach_car_front / (new_car.speed - car.speed)
+
+                # Predicted position of the car in front at that time
+                predicted_car_front_bottom = car_bottom + (car.speed * time_to_reach_car_front)
+
+                # Check if new car will overlap with the car in front at that time
+                if time_to_reach_car_front > 0 and time_to_reach_car_front < lookahead and \
+                   new_car.y < predicted_car_front_bottom:
+                    return True
+
+    return False
+
+def remove_overlapping_cars(cars):
+    cars_to_remove = set()
+
+    for i in range(len(cars)):
+        for j in range(i + 1, len(cars)):
+            car1, car2 = cars[i], cars[j]
+            if car1.x == car2.x:  # Same lane
+                if (car1.y < car2.bottom() and car1.bottom() > car2.y):
+                    # Overlap detected, mark one for removal
+                    cars_to_remove.add(car2)  # Choose either car1 or car2 to remove
+
+    # Remove marked cars
+    for car in cars_to_remove:
+        cars.remove(car)
 
 
 # Create the game window
@@ -209,8 +274,8 @@ enemy_car_images = [
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck_2.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "truck_1.png")).convert_alpha(),
-
 ]
+
 
 def scale_car_images(car_images, scale_factor):
     return [pygame.transform.scale(img, (int(img.get_width() * scale_factor), int(img.get_height() * scale_factor))) for img in car_images]
@@ -264,8 +329,6 @@ text_yes = font.render("Yes", True, BLACK)
 text_no = font.render("No", True, BLACK)
 text_question = font.render("Humor?", True, BLACK)
 
-        #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 
 
@@ -306,30 +369,26 @@ while True:
 
         pygame.display.flip()
     
-        
-        acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
-        crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
-        brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
-        norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3"))
-        heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
-        missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
+    
 
         if folder == "me":
             
             pygame.mixer.music.set_volume(0.5)
-            heli_sound.set_volume(2)
+            heli_sound_me.set_volume(2)
         else:
             pygame.mixer.music.set_volume(0.7)
-            heli_sound.set_volume(0.5)
+            heli_sound_compi.set_volume(0.5)
         #play music
        
 
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
     elif game_state == "game_running":
         
-        
-        pygame.mixer.Sound.play(heli_sound, -1)
+        if folder == "compi":
+            pygame.mixer.Sound.play(heli_sound_compi, -1)
+        else:
+            pygame.mixer.Sound.play(heli_sound_me, -1)
     
         
          # Scroll the background
@@ -369,29 +428,62 @@ while True:
                 
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
                 player_y -= 6
-                pygame.mixer.Sound.play(acc_sound)
-            if not keys[pygame.K_UP]:
-                pygame.mixer.Sound.fadeout(acc_sound, 250)
-                
-            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + player_car_img.get_height() <= HEIGHT:
-                player_y += 6
-                pygame.mixer.Sound.play(brake_sound)
-                
-            if not keys[pygame.K_DOWN]:
 
-                pygame.mixer.Sound.stop(brake_sound)
+            
+            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
+                player_y += 6
+                
+                
+            
             if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                pygame.mixer.Sound.play(norm_sound)
                 if player_y < HEIGHT - HEIGHT / 5:
                     player_y += 2
 
-            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
-                pygame.mixer.Sound.stop(norm_sound)
+            
             
             player_x -= angle * 0.7
             
             if player_x <= WIDTH/1224*350 or player_x + player_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
                 game_over = True
+         
+            #sound
+            if keys[pygame.K_UP]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(acc_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(acc_sound_me,-1)
+                    
+            if not keys[pygame.K_UP]:
+                if folder == "compi":
+                    pygame.mixer.Sound.fadeout(acc_sound_compi, 250)
+                else:
+                    pygame.mixer.Sound.fadeout(acc_sound_me, 250)
+                    
+                
+            if keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(brake_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(brake_sound_me,-1)
+            if not keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.stop(brake_sound_compi,)
+                else:
+                    pygame.mixer.Sound.stop(brake_sound_me)
+                            
+            if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(norm_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(norm_sound_me,-1)
+            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.stop(norm_sound_compi)
+                else:
+                    pygame.mixer.Sound.stop(norm_sound_me)
+                
+            
+           
 
         
         # Calculate elapsed time
@@ -446,19 +538,25 @@ while True:
 
 
         for lane in range(NUM_LANES):
-            if random.randint(0, 800) < 6:
+            if random.randint(0, 800) < 4:
                 selected_image = random.choice(scaled_enemy_car_images)
+                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*508 - 0.5 * selected_image.get_width(), WIDTH/1224*610 - 0.5 * selected_image.get_width(), WIDTH/1224*713 - 0.5 * selected_image.get_width(), WIDTH/1224*815 - 0.5 * selected_image.get_width()])
+                speed = random.randint(1, 8)
+                new_car = Car(x_position, -selected_image.get_height(), speed, selected_image)
+                if not will_collide(new_car, enemy_cars):
+                    enemy_cars.append(new_car)
+                    remove_overlapping_cars(enemy_cars)
+                #too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
+                #if not too_close:
+                    #speed = random.randint(1, 8)
+                    #enemy_cars.append(Car(x_position, speed, selected_image))
 
 
-                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*500 - 0.5 * selected_image.get_width(), WIDTH/1224*600 - 0.5 * selected_image.get_width(), WIDTH/1224*700 - 0.5 * selected_image.get_width(), WIDTH/1224*800 - 0.5 * selected_image.get_width()])
-                too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
-                if not too_close:
-                    speed = random.randint(1, 8)
-                    enemy_cars.append(Car(x_position, speed, selected_image))
+
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
         for car in enemy_cars:
-            enemy_mask = pygame.mask.from_surface(car.image)  # Assuming enemy_car has an 'image' attribute
+            enemy_mask = pygame.mask.from_surface(car.image)  
             offset = (car.x - player_x, car.y - player_y)
             
             if player_mask.overlap(enemy_mask, offset):
@@ -467,15 +565,16 @@ while True:
         #collision check between player and car.
         
         for circle in circles:
-            circle_speed = 2
-            distance_x = player_x + player_car_img.get_width() / 2 - circle.x
-            distance_y = player_y + player_car_img.get_height() / 2 - circle.y
-            angle1 = math.atan2(distance_y, distance_x)
-            circle.x += circle_speed * math.cos(angle1)
-            circle.y += circle_speed * math.sin(angle1)
+            if not circle.explosion_triggered:
+                circle_speed = 2
+                distance_x = player_x + player_car_img.get_width() / 2 - circle.x
+                distance_y = player_y + player_car_img.get_height() / 2 - circle.y
+                angle1 = math.atan2(distance_y, distance_x)
+                circle.x += circle_speed * math.cos(angle1)
+                circle.y += circle_speed * math.sin(angle1)
 
-            if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
-                circle.warning_start_time = elapsed_time
+                if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
+                    circle.warning_start_time = elapsed_time
         
     
     
@@ -516,7 +615,7 @@ while True:
 
             # Draw the explosion circle
             if circle.explosion_triggered:
-                circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
+                circleexplo_x = int(circle_x - explosion_img.get_width()/2)
                 screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
   
 
