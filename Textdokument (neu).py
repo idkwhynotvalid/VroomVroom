@@ -85,11 +85,14 @@ class Helicopter:
 
 
 class Car:
-    def __init__(self, x_position, initial_speed, image):
+    def __init__(self, x_position, y_position, speed, image):
         self.x = x_position
-        self.y = 2*-player_car_img.get_height() # Start above the screen
-        self.speed = initial_speed
+        self.y = y_position
+        self.speed = speed
         self.image = image
+
+    def bottom(self):
+        return self.y + self.image.get_height()
 
 
 class Circle:
@@ -100,7 +103,6 @@ class Circle:
         self.lifespan = circle_spawn_interval  # Set lifespan for each circle
         self.warning_start_time = None
         self.explosion_triggered = False
-        self.explosion_x = player_x
         self.explosion_y = None
         self.explosion_set = False
         self.show_warning = False
@@ -188,8 +190,49 @@ def is_collision():
         if player_mask.overlap(warn_mask, offset):
             game_over = True
 
+def will_collide(new_car, existing_cars, lookahead=1200):
+    new_car_bottom = new_car.bottom()
 
-#startscreen background setup
+    for car in existing_cars:
+        if car.x == new_car.x:  # Same lane
+            car_bottom = car.bottom()
+
+            # Initial overlap check at spawn
+            if not (new_car_bottom < car.y or new_car.y > car_bottom):
+                return True
+
+            # Future collision check based on speed differences
+            if new_car.speed > car.speed:
+                # Distance needed for the new car to reach the bottom of the car in front
+                distance_to_reach_car_front = car.y - new_car_bottom
+
+                # Predicted time for the new car to reach this distance
+                time_to_reach_car_front = distance_to_reach_car_front / (new_car.speed - car.speed)
+
+                # Predicted position of the car in front at that time
+                predicted_car_front_bottom = car_bottom + (car.speed * time_to_reach_car_front)
+
+                # Check if new car will overlap with the car in front at that time
+                if time_to_reach_car_front > 0 and time_to_reach_car_front < lookahead and \
+                   new_car.y < predicted_car_front_bottom:
+                    return True
+
+    return False
+
+def remove_overlapping_cars(cars):
+    cars_to_remove = set()
+
+    for i in range(len(cars)):
+        for j in range(i + 1, len(cars)):
+            car1, car2 = cars[i], cars[j]
+            if car1.x == car2.x:  # Same lane
+                if (car1.y < car2.bottom() and car1.bottom() > car2.y):
+                    # Overlap detected, mark one for removal
+                    cars_to_remove.add(car2)  # Choose either car1 or car2 to remove
+
+    # Remove marked cars
+    for car in cars_to_remove:
+        cars.remove(car)
 
 
 # Create the game window
@@ -397,7 +440,7 @@ while True:
                 acc_sound_me.set_volume(0)
                 acc_sound_compi.set_volume(0)
             
-            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
+            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + player_car_img.get_height() <= HEIGHT:
                 player_y += 6
                 brake_sound_me.set_volume(1)
                 brake_sound_compi.set_volume(1)
@@ -479,19 +522,25 @@ while True:
 
 
         for lane in range(NUM_LANES):
-            if random.randint(0, 800) < 6:
+            if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
+                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*508 - 0.5 * selected_image.get_width(), WIDTH/1224*610 - 0.5 * selected_image.get_width(), WIDTH/1224*713 - 0.5 * selected_image.get_width(), WIDTH/1224*815 - 0.5 * selected_image.get_width()])
+                speed = random.randint(1, 8)
+                new_car = Car(x_position, -selected_image.get_height(), speed, selected_image)
+                if not will_collide(new_car, enemy_cars):
+                    enemy_cars.append(new_car)
+                    remove_overlapping_cars(enemy_cars)
+                #too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
+                #if not too_close:
+                    #speed = random.randint(1, 8)
+                    #enemy_cars.append(Car(x_position, speed, selected_image))
 
 
-                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*500 - 0.5 * selected_image.get_width(), WIDTH/1224*600 - 0.5 * selected_image.get_width(), WIDTH/1224*700 - 0.5 * selected_image.get_width(), WIDTH/1224*800 - 0.5 * selected_image.get_width()])
-                too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
-                if not too_close:
-                    speed = random.randint(1, 8)
-                    enemy_cars.append(Car(x_position, speed, selected_image))
+
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
         for car in enemy_cars:
-            enemy_mask = pygame.mask.from_surface(car.image)  # Assuming enemy_car has an 'image' attribute
+            enemy_mask = pygame.mask.from_surface(car.image)  
             offset = (car.x - player_x, car.y - player_y)
             
             if player_mask.overlap(enemy_mask, offset):
@@ -500,15 +549,16 @@ while True:
         #collision check between player and car.
         
         for circle in circles:
-            circle_speed = 2
-            distance_x = player_x + player_car_img.get_width() / 2 - circle.x
-            distance_y = player_y + player_car_img.get_height() / 2 - circle.y
-            angle1 = math.atan2(distance_y, distance_x)
-            circle.x += circle_speed * math.cos(angle1)
-            circle.y += circle_speed * math.sin(angle1)
+            if not circle.explosion_triggered:
+                circle_speed = 2
+                distance_x = player_x + player_car_img.get_width() / 2 - circle.x
+                distance_y = player_y + player_car_img.get_height() / 2 - circle.y
+                angle1 = math.atan2(distance_y, distance_x)
+                circle.x += circle_speed * math.cos(angle1)
+                circle.y += circle_speed * math.sin(angle1)
 
-            if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
-                circle.warning_start_time = elapsed_time
+                if circle.warning_start_time is None and elapsed_time  % circle_follow * FPS == 0:
+                    circle.warning_start_time = elapsed_time
         
     
     
@@ -553,9 +603,13 @@ while True:
 
             # Draw the explosion circle
             if circle.explosion_triggered:
-                circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
-                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))
+
                 
+                
+
+                circleexplo_x = int(circle_x - explosion_img.get_width()/2)
+                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
+
   
 
 
