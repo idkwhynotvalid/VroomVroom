@@ -139,7 +139,7 @@ def is_collision():
         print("hallo")
 
 
-
+#startscreen background setup
 
 
 # Create the game window
@@ -164,7 +164,7 @@ y_position2 = HEIGHT - helicopter_img.get_height() -50
 
 
 # Load car images
-player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "player_car.png")).convert_alpha()
+player_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "fc-rx7.png")).convert_alpha()
 
 enemy_car_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "enemy_car.png")).convert_alpha()
 
@@ -175,7 +175,7 @@ explosion_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "explo
 warn_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "3818227.png")).convert_alpha()
 
 # Scale the car images
-car_scale1 = 0.5
+car_scale1 = 1
 car_scale2 = 0.1
 danger_scale = 1.5
 warn_scale = 1.4
