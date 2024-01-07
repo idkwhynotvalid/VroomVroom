@@ -30,8 +30,6 @@ NUM_LANES = 5
 
 folder = "compi"
 
-#l = os.path.join("audio", folder, "auto gas.mp3")
-#l = r"inf audio\{ort}\auto gas.mp3".format(ort=folder)
 
 #import sound
 acc_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto gas.mp3"))
@@ -207,9 +205,6 @@ def is_collision():
 
     offset = (circle.x - player_x, circle.y - player_y)
     
-    #if player_mask.overlap(circle_mask, offset):
-#        game_over = True
-#       print("hallo")
 
     warn_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
     offset = (int(circle.x - player_x - warn_img.get_width() / 2), int(circle.y - player_y - warn_img.get_height() / 2))
@@ -370,17 +365,14 @@ def explode(expl_x, expl_y):
     global current_explosion_frame
     global explosion_delay
 
-    pygame.mixer.Sound.play(missile_sound_compi)
-    #print("explosion")
+
     current_explosion_frame = 0
     explosion_delay = 0
     
     
     
     explosion_event = 1
-    # 0 = stop
-    # 1 = start
-    # 2 = animating
+
 
     explosion_x = expl_x
     explosion_y = expl_y
@@ -413,7 +405,7 @@ def explosion_anim():
 
         explosion_y += 20 * multiplication 
         
-        #print(elapsed_time, explosion_x, explosion_y)
+
 
         explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
         center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2),
@@ -575,18 +567,17 @@ while True:
         pygame.display.flip()
     
     
-
-        if folder == "me":
-            
+        #music volume
+        if folder == "me":            
             pygame.mixer.music.set_volume(0.5)
             heli_sound_me.set_volume(2)
         else:
             pygame.mixer.music.set_volume(0.5)
             heli_sound_compi.set_volume(0.3)
-        #play music
+        
         clock.tick(FPS)
 
-
+        #play music
         pygame.mixer.music.play(-1)
 
 
@@ -859,6 +850,7 @@ while True:
                 
             screen.blit(text, text_rect)
             pygame.display.flip()
+            
             #quit music
             pygame.mixer.Sound.stop(heli_sound_compi)
             pygame.mixer.Sound.stop(norm_sound_compi)
@@ -867,9 +859,9 @@ while True:
             pygame.mixer.Sound.stop(norm_sound_me)
             pygame.mixer.Sound.stop(acc_sound_me)
             pygame.mixer.music.fadeout(3000)
-            # Wait for a few seconds before quitting
             
-
+            
+            # Wait for a few seconds before quitting         
             pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
             pygame.quit()
             sys.exit()
@@ -877,5 +869,3 @@ while True:
     explosion_anim()
 
 
-    #different speed for cars, 4 lanes. hallo
-    #66, 50, 311. rayan to change
