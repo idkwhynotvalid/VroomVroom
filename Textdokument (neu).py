@@ -265,16 +265,20 @@ def is_overlapping(car1, car2):
 
 
 def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
+    # Define the vertical spawn area where the new car will appear
     spawn_area_top = -new_car_height - buffer
     spawn_area_bottom = buffer
 
     for car in existing_cars:
-        if car.x == new_car_x:
+        if car.x == new_car_x:  # Check only cars in the same lane
+            # Each car's vertical space
             car_top = car.y
             car_bottom = car.y + car.image.get_height()
+
+            # Check if the car's vertical space overlaps with the spawn area
             if not (car_bottom < spawn_area_top or car_top > spawn_area_bottom):
-                return False
-    return True
+                return False  # The spawn area is not clear
+    return True  # The spawn area is clear
 
 def get_lane_position(lane, width, car_width):
     lane_positions = [
