@@ -135,8 +135,7 @@ def is_collision():
     offset = (circle.x - player_x, circle.y - player_y)
     
     if player_mask.overlap(circle_mask, offset):
-#        game_over = True
-#       print("hallo")
+        return
 
 
 #startscreen background setup
