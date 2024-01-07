@@ -48,6 +48,7 @@ heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.m
         #music import
 #music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
+
 class StartScreenAnimation(pygame.sprite.Sprite):
     def __init__(self, scale=1.0):
         super().__init__()
@@ -75,6 +76,7 @@ class StartScreenAnimation(pygame.sprite.Sprite):
             self.frame_counter = 0
             self.current_sprite = (self.current_sprite + 1) % len(self.sprites)
             self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * self.scale), int(self.sprites[self.current_sprite].get_height() * self.scale)))
+
 
 
 class background_load (pygame.sprite.Sprite):
@@ -513,7 +515,10 @@ while True:
         #play music
         clock.tick(FPS)
 
+
+        #pygame.mixer.music.play(-1)
 #         pygame.mixer.music.play(-1)
+
 
     elif game_state == "game_running":
         
