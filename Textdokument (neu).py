@@ -334,7 +334,6 @@ def explosion_anim():
     global explosion_event
     global current_explosion_frame
     global explosion_delay
-    global scale
 
     explosion_speed = 5
 
@@ -352,21 +351,25 @@ def explosion_anim():
         global explosion_x
         global explosion_y
 
+        explosion_y += 10
+        
+        print(explosion_x, explosion_y)
+
         explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
-        center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2) * scale ,
-                (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2) * scale )
+        center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2),
+                (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
 
-        screen.blit(explosion_img_list[current_explosion_frame], explosion_img_rect)
+        screen.blit(pygame.transform.scale(explosion_img_list[current_explosion_frame], (
+            explosion_img_list[current_explosion_frame].get_width() * 2,
+            explosion_img_list[current_explosion_frame].get_height() * 2
+        )), explosion_img_rect)
         
         explosion_delay += 1
 
         if explosion_delay % explosion_speed == 0:
             current_explosion_frame += 1
     
-
-
-
 
 
 
@@ -428,13 +431,13 @@ text_question = font.render("Humor?", True, BLACK)
 #spritegroup
 
 moving_sprites = pygame.sprite.Group()
-
-
-
+first = 1
+iteration = 0
 
 # Game loop
 while True:
-
+    
+    iteration += 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -451,12 +454,32 @@ while True:
                 print("Starting the game...")  # Replace with your game start code
             elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
                 game_state = "game_running"
-                
+        
         
         # Draw start screen elements
         moving_sprites.draw(screen)
         moving_sprites.update()
         
+        bg_frame_0 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_0.png")).convert_alpha()
+        bg_frame_1 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_1.png")).convert_alpha()
+        bg_frame_2 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_2.png")).convert_alpha()
+        bg_frame_3 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_3.png")).convert_alpha()
+        bg_frame_4 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_4.png")).convert_alpha()
+        bg_frame_5 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_5.png")).convert_alpha()
+
+        bg_frame_list = [bg_frame_0,
+                         bg_frame_1,
+                         bg_frame_2,
+                         bg_frame_3,
+                         bg_frame_4,
+                         bg_frame_5
+                         ]
+
+
+
+    
+        screen.blit(pygame.transform.scale(bg_frame_list[iteration % 6], (bg_frame_list[iteration % 6].get_width() * 3.8, bg_frame_list[iteration % 6].get_height() * 3.8)), (-450, 0))
+
         pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
         pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
         screen.blit(text_yes, (350, 315))
@@ -686,18 +709,6 @@ while True:
         rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
         screen.blit(rotated_helicopter, rotated_rect2)
 
-
-
-        # test
-        if elapsed_time == 120:
-            explode(100, 500)
-
-        if elapsed_time == 360:
-            explode(200, 500)
-
-        if elapsed_time == 720:
-            explode(300, 500)
-
         explosion_anim()
 
 
@@ -719,18 +730,21 @@ while True:
                 screen.blit(warn_img, (circle_x, circle_y))
 
             # Draw the explosion circle
+            
+            
             if circle.explosion_triggered:
                 
-                
-                
 
-                circleexplo_x = int(circle_x - explosion_img.get_width()/2)
-                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
-
+                 circleexplo_x = int(circle_x - explosion_img_frame1.get_width()/2)
+                 
+                 
+                 
+                 if first == 1:
+                    print(circleexplo_x, circle.explosion_y)
+                    explode(circleexplo_x, circle.explosion_y)            
+                    first = 0
   
 
-
-        
 
 
         score2 = int(score)
