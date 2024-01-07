@@ -377,8 +377,8 @@ while True:
             pygame.mixer.music.set_volume(0.5)
             heli_sound_me.set_volume(2)
         else:
-            pygame.mixer.music.set_volume(0.7)
-            heli_sound_compi.set_volume(0.5)
+            pygame.mixer.music.set_volume(0.5)
+            heli_sound_compi.set_volume(0.3)
         #play music
        
 
@@ -390,10 +390,23 @@ while True:
             pygame.mixer.Sound.play(heli_sound_compi, -1)
             pygame.mixer.Sound.play(norm_sound_compi,-1)
             pygame.mixer.Sound.play(acc_sound_compi,-1)
+            
         else:
             pygame.mixer.Sound.play(heli_sound_me, -1)
             pygame.mixer.Sound.play(norm_sound_me,-1)
             pygame.mixer.Sound.play(acc_sound_me,-1)
+            
+        
+#        current_time = time.time() - start_time
+#        missile_time = current_time - 18
+#        
+#        missile_sound_compi.set_volume(0)
+#        
+#        if current_time == 18:
+#            missile_sound_compi.set_volume(1)
+#        if missile_time % 13 == 0:
+#            missile_sound_compi.set_volume(1)
+            
     
         
          # Scroll the background
@@ -434,7 +447,9 @@ while True:
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
                 player_y -= 6
                 acc_sound_me.set_volume(1)
-                acc_sound_compi.set_volume(1)
+                acc_sound_compi.set_volume(0.5)
+                norm_sound_me.set_volume(0)
+                norm_sound_compi.set_volume(0)
                 
             else:
                 acc_sound_me.set_volume(0)
@@ -442,11 +457,7 @@ while True:
             
             if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + player_car_img.get_height() <= HEIGHT:
                 player_y += 6
-                brake_sound_me.set_volume(1)
-                brake_sound_compi.set_volume(1)
-            else:
-                brake_sound_me.set_volume(0)
-                brake_sound_compi.set_volume(0)
+                
                 
                 
             
@@ -455,9 +466,8 @@ while True:
                     player_y += 2
                 norm_sound_me.set_volume(1)
                 norm_sound_compi.set_volume(1)
-            else:
-                norm_sound_me.set_volume(0)
-                norm_sound_compi.set_volume(0)
+            
+                
 
             
             
@@ -589,10 +599,7 @@ while True:
             if circle.explosion_triggered:
                 circle.explosion_y += speed3 + 0.01 * distance_to_bottom + 0.1*current_time
                 collision_check_enabled = False
-                if folder == "compi":
-                    pygame.mixer.Sound.play(missile_sound_compi)
-                else:
-                    pygame.mixer.Sound.play(missile_sound_me)
+                
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
             if circle.show_warning:
@@ -603,7 +610,7 @@ while True:
 
             # Draw the explosion circle
             if circle.explosion_triggered:
-
+                
                 
                 
 
@@ -634,7 +641,14 @@ while True:
                 
             screen.blit(text, text_rect)
             pygame.display.flip()
-            pygame.mixer.quit()
+            #pygame.mixer.quit()
+            pygame.mixer.Sound.stop(heli_sound_compi)
+            pygame.mixer.Sound.stop(norm_sound_compi)
+            pygame.mixer.Sound.stop(acc_sound_compi)
+            pygame.mixer.Sound.stop(heli_sound_me)
+            pygame.mixer.Sound.stop(norm_sound_me)
+            pygame.mixer.Sound.stop(acc_sound_me)
+            pygame.mixer.music.fadeout(3000)
             # Wait for a few seconds before quitting
             pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
             pygame.quit()
