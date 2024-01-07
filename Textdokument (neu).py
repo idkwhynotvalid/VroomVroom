@@ -50,7 +50,7 @@ heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.m
 missile_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Missile.mp3"))
 
         #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 class background_load (pygame.sprite.Sprite):
     def __innit__(self, pos_x, pos_y):
@@ -386,7 +386,7 @@ while True:
         #play music
        
 
-        pygame.mixer.music.play(-1)
+#         pygame.mixer.music.play(-1)
 
     elif game_state == "game_running":
         
