@@ -799,6 +799,7 @@ while True:
                 
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
+                first = 1
             if circle.show_warning:
                 collision_check_enabled = True
                 circle_x = int(circle.x - warn_img.get_width()/2)
