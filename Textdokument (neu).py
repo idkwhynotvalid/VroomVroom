@@ -263,7 +263,15 @@ def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
                 return False
     return True
 
-
+def get_lane_position(lane, width, car_width):
+    lane_positions = [
+        width / 1224 * 400 - 0.5 * car_width,
+        width / 1224 * 508 - 0.5 * car_width,
+        width / 1224 * 610 - 0.5 * car_width,
+        width / 1224 * 713 - 0.5 * car_width,
+        width / 1224 * 815 - 0.5 * car_width
+    ]
+    return lane_positions[lane % NUM_LANES]
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -423,6 +431,7 @@ player_y = HEIGHT - HEIGHT / 5
 desired_helicopter_x = player_x
 # Initialize enemy cars
 enemy_cars = []
+last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
 #circles
 circles = []
 
@@ -696,46 +705,35 @@ while True:
 
 
 
-        last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
+
         
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
-                x_position = random.choice([
-                    WIDTH/1224*400 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*508 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*610 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*713 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*815 - 0.5 * selected_image.get_width()
-                ])
+                x_position = get_lane_position(lane, WIDTH, selected_image.get_width())
                 new_car_height = selected_image.get_height()
                 new_car = Car(x_position, -new_car_height, random.randint(1, 8), selected_image)
 
-                # Check if spawn area is clear and no recent car has been spawned in this lane
                 if is_spawn_area_clear(x_position, new_car_height, enemy_cars) and \
                 (last_spawn_position[lane] < 0 or last_spawn_position[lane] - new_car_height > mindistance):
                     if not will_collide(new_car, enemy_cars):
                         enemy_cars.append(new_car)
-                        remove_overlapping_cars(enemy_cars)
                         last_spawn_position[lane] = new_car.y  # Update last spawn position
                     else:
                         print("Collision predicted, car not spawned.")
                 else:
-                    print("cant spawn")
-                remove_overlapping_cars(enemy_cars)
-                if remove_overlapping_cars(enemy_cars):
-                    print("ddd")
+                    print("Spawn area not clear or car spawned too recently, car not spawned.")
 
-        rotated_player_car = pygame.transform.rotate(player_car_img, angle)
-        player_mask = pygame.mask.from_surface(rotated_player_car)
-        for car in enemy_cars:
-            enemy_mask = pygame.mask.from_surface(car.image)  
-            offset = (car.x - player_x, car.y - player_y)
-            
-            if player_mask.overlap(enemy_mask, offset):
-                game_over = True
+                rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+                player_mask = pygame.mask.from_surface(rotated_player_car)
+                for car in enemy_cars:
+                    enemy_mask = pygame.mask.from_surface(car.image)  
+                    offset = (car.x - player_x, car.y - player_y)
+                    
+                    if player_mask.overlap(enemy_mask, offset):
+                        game_over = True
 
-        #collision check between player and car.
+                #collision check between player and car.
         
         for circle in circles:
             if not circle.explosion_triggered:
