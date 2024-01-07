@@ -177,7 +177,7 @@ warn_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "3818227.pn
 # Scale the car images
 car_scale1 = 1
 car_scale2 = 0.1
-danger_scale = 1.5
+danger_scale = 1.4
 warn_scale = 1.4
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
 enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
