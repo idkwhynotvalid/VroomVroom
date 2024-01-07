@@ -641,7 +641,7 @@ while True:
                 
             screen.blit(text, text_rect)
             pygame.display.flip()
-            #pygame.mixer.quit()
+            #quit music
             pygame.mixer.Sound.stop(heli_sound_compi)
             pygame.mixer.Sound.stop(norm_sound_compi)
             pygame.mixer.Sound.stop(acc_sound_compi)
