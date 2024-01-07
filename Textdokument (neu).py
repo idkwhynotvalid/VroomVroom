@@ -277,6 +277,99 @@ enemy_car_images = [
 ]
 
 
+# explosion variables before main loop
+
+explosion_img_frame1 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_0.png")).convert_alpha()
+explosion_img_frame2 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_1.png")).convert_alpha()
+explosion_img_frame3 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_2.png")).convert_alpha()
+explosion_img_frame4 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_3.png")).convert_alpha()
+explosion_img_frame5 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_4.png")).convert_alpha()
+explosion_img_frame6 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_5.png")).convert_alpha()
+explosion_img_frame7 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_6.png")).convert_alpha()
+explosion_img_frame8 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_7.png")).convert_alpha()
+explosion_img_frame9 = pygame.image.load(os.path.join(os.path.dirname(__file__), "elxplo_frame_8.png")).convert_alpha()
+
+
+explosion_img_list = [explosion_img_frame1,
+                      explosion_img_frame2,
+                      explosion_img_frame3,
+                      explosion_img_frame4,
+                      explosion_img_frame5,
+                      explosion_img_frame6,
+                      explosion_img_frame7,
+                      explosion_img_frame8,
+                      explosion_img_frame9
+                      ] # ...
+
+
+explosion_event = 0
+current_explosion_frame = 0
+
+# functions
+
+def explode(expl_x, expl_y):
+    global explosion_event
+    global explosion_x
+    global explosion_y
+    global current_explosion_frame
+    global explosion_delay
+    global scale
+
+
+    print("explosion")
+    current_explosion_frame = 0
+    explosion_delay = 0
+
+    explosion_event = 1
+    # 0 = stop
+    # 1 = start
+    # 2 = animating
+
+    explosion_x = expl_x
+    explosion_y = expl_y
+
+
+
+def explosion_anim():
+    global explosion_event
+    global current_explosion_frame
+    global explosion_delay
+    global scale
+
+    explosion_speed = 5
+
+    if explosion_event == 1: # start animation
+        explosion_event = 2
+        current_explosion_frame = 0
+
+    elif current_explosion_frame == len(explosion_img_list): # end animation
+        explosion_event = 0
+        return
+
+    elif explosion_event == 2: # animate
+        
+        # draw current frame
+        global explosion_x
+        global explosion_y
+
+        explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
+        center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2) * scale ,
+                (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2) * scale )
+        )
+
+        screen.blit(explosion_img_list[current_explosion_frame], explosion_img_rect)
+        
+        explosion_delay += 1
+
+        if explosion_delay % explosion_speed == 0:
+            current_explosion_frame += 1
+    
+
+
+
+
+
+
 def scale_car_images(car_images, scale_factor):
     return [pygame.transform.scale(img, (int(img.get_width() * scale_factor), int(img.get_height() * scale_factor))) for img in car_images]
 
@@ -341,6 +434,7 @@ moving_sprites = pygame.sprite.Group()
 
 # Game loop
 while True:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -495,8 +589,6 @@ while True:
 
         
         
-        
-        
   
 
         elapsed_time += 1
@@ -593,8 +685,17 @@ while True:
 
 
 
+        # test
+        if elapsed_time == 120:
+            explode(100, 500)
 
+        if elapsed_time == 360:
+            explode(200, 500)
 
+        if elapsed_time == 720:
+            explode(300, 500)
+
+        explosion_anim()
 
 
         # Draw circles, To change
@@ -615,8 +716,10 @@ while True:
 
             # Draw the explosion circle
             if circle.explosion_triggered:
-                circleexplo_x = int(circle_x - explosion_img.get_width()/2)
-                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
+                explode(circle_x, circle_y)
+                
+                # circleexplo_x = int(circle_x - explosion_img.get_width()/2)
+                # screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
   
 
 
