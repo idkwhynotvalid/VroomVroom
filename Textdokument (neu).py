@@ -120,7 +120,7 @@ last_circle_spawn_time = 0
 checkingsth = True
 distance_to_bottom = 0
 collision_check_enabled = True
-
+last_chosen_lane = None
 
 
 def spawn_circle():
@@ -194,45 +194,49 @@ def will_collide(new_car, existing_cars, lookahead=1200):
     new_car_bottom = new_car.bottom()
 
     for car in existing_cars:
-        if car.x == new_car.x:  # Same lane
+        if car.x == new_car.x:
             car_bottom = car.bottom()
-
-            # Initial overlap check at spawn
             if not (new_car_bottom < car.y or new_car.y > car_bottom):
                 return True
-
-            # Future collision check based on speed differences
             if new_car.speed > car.speed:
-                # Distance needed for the new car to reach the bottom of the car in front
                 distance_to_reach_car_front = car.y - new_car_bottom
-
-                # Predicted time for the new car to reach this distance
                 time_to_reach_car_front = distance_to_reach_car_front / (new_car.speed - car.speed)
-
-                # Predicted position of the car in front at that time
                 predicted_car_front_bottom = car_bottom + (car.speed * time_to_reach_car_front)
-
-                # Check if new car will overlap with the car in front at that time
-                if time_to_reach_car_front > 0 and time_to_reach_car_front < lookahead and \
-                   new_car.y < predicted_car_front_bottom:
+                if 0 < time_to_reach_car_front < lookahead and new_car.y < predicted_car_front_bottom:
                     return True
-
     return False
 
 def remove_overlapping_cars(cars):
-    cars_to_remove = set()
+    cars_to_remove = []
 
-    for i in range(len(cars)):
-        for j in range(i + 1, len(cars)):
-            car1, car2 = cars[i], cars[j]
-            if car1.x == car2.x:  # Same lane
-                if (car1.y < car2.bottom() and car1.bottom() > car2.y):
-                    # Overlap detected, mark one for removal
-                    cars_to_remove.add(car2)  # Choose either car1 or car2 to remove
+    # Sort cars in each lane by their y position
+    sorted_cars = sorted(cars, key=lambda car: (car.x, car.y))
 
-    # Remove marked cars
+    for i in range(len(sorted_cars) - 1):
+        car1, car2 = sorted_cars[i], sorted_cars[i + 1]
+
+        # Check only cars in the same lane
+        if car1.x == car2.x:
+            # Check if car1 overlaps with car2
+            if car1.y < car2.y < car1.y + car1.image.get_height():
+                cars_to_remove.append(car2)  # Choose the car ahead to remove
+
+    # Remove the cars that are overlapping
     for car in cars_to_remove:
         cars.remove(car)
+
+def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
+    spawn_area_top = -new_car_height - buffer
+    spawn_area_bottom = buffer
+
+    for car in existing_cars:
+        if car.x == new_car_x:
+            car_top = car.y
+            car_bottom = car.y + car.image.get_height()
+            if not (car_bottom < spawn_area_top or car_top > spawn_area_bottom):
+                return False
+    return True
+
 
 
 # Create the game window
@@ -540,16 +544,25 @@ while True:
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
-                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*508 - 0.5 * selected_image.get_width(), WIDTH/1224*610 - 0.5 * selected_image.get_width(), WIDTH/1224*713 - 0.5 * selected_image.get_width(), WIDTH/1224*815 - 0.5 * selected_image.get_width()])
-                speed = random.randint(1, 8)
-                new_car = Car(x_position, -selected_image.get_height(), speed, selected_image)
-                if not will_collide(new_car, enemy_cars):
-                    enemy_cars.append(new_car)
-                    remove_overlapping_cars(enemy_cars)
-                #too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
-                #if not too_close:
-                    #speed = random.randint(1, 8)
-                    #enemy_cars.append(Car(x_position, speed, selected_image))
+                x_position = random.choice([
+                    WIDTH/1224*400 - 0.5 * selected_image.get_width(), 
+                    WIDTH/1224*508 - 0.5 * selected_image.get_width(), 
+                    WIDTH/1224*610 - 0.5 * selected_image.get_width(), 
+                    WIDTH/1224*713 - 0.5 * selected_image.get_width(), 
+                    WIDTH/1224*815 - 0.5 * selected_image.get_width()
+                ])
+                new_car_height = selected_image.get_height()
+                new_car = Car(x_position, -new_car_height, random.randint(1, 8), selected_image)
+
+                if is_spawn_area_clear(x_position, new_car_height, enemy_cars):
+                    if not will_collide(new_car, enemy_cars):
+                        enemy_cars.append(new_car)
+                    else:
+                        print("Collision predicted, car not spawned.")
+                else:
+                    print("Spawn area not clear, car not spawned.")
+                remove_overlapping_cars(enemy_cars)
+
 
 
 
