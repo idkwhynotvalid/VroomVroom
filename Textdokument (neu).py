@@ -378,25 +378,7 @@ while True:
             
            
            
-           
-           
-#             if keys[pygame.K_UP] and folder == "me":
- #               pygame.mixer.Sound.play(acc_sound_me)
-  #          if not keys[pygame.K_UP] and folder == "me":
-   #             pygame.mixer.Sound.fadeout(acc_sound_me, 250)
-   #             
-  #          if keys[pygame.K_DOWN] and folder == "me":
-   #             pygame.mixer.Sound.play(brake_sound_me)
-    #        if not keys[pygame.K_DOWN] and folder == "me":
-    #            pygame.mixer.Sound.stop(brake_sound_me)
-     #       
-      #      if not keys[pygame.K_UP] and not keys[pygame.K_DOWN] and folder == "me":
-       #         pygame.mixer.Sound.play(norm_sound_me)
-        #    if keys[pygame.K_UP] or keys[pygame.K_DOWN] and folder == "me":
-         #       pygame.mixer.Sound.stop(norm_sound_me)
-        
-        
-        
+
         
         # Calculate elapsed time
         current_time = time.time() - start_time
