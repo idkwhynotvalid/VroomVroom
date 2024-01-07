@@ -33,13 +33,24 @@ folder = "compi"
 #l = os.path.join("audio", folder, "auto gas.mp3")
 #l = r"inf audio\{ort}\auto gas.mp3".format(ort=folder)
 
-acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
-crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
-brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
-norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3"))
-heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
-missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
+#import sound
+acc_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto gas.mp3"))
+crash_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Auto crash.mp3"))
+brake_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto bremsen.mp3"))
+norm_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "auto norm.mp3"))
+heli_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Helicopter.mp3"))
+missile_sound_compi = pygame.mixer.Sound(os.path.join("inf audio", "compi", "Missile.mp3"))
 
+#import human sound
+acc_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto gas.mp3"))
+crash_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Auto crash.mp3"))
+brake_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto bremsen.mp3"))
+norm_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto norm.mp3"))
+heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.mp3"))
+missile_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Missile.mp3"))
+
+        #music import
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -134,7 +145,7 @@ def is_collision():
     circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
     offset = (circle.x - player_x, circle.y - player_y)
     
-    if player_mask.overlap(circle_mask, offset):
+    #if player_mask.overlap(circle_mask, offset):
 #        game_over = True
 #       print("hallo")
 
@@ -222,8 +233,6 @@ text_yes = font.render("Yes", True, BLACK)
 text_no = font.render("No", True, BLACK)
 text_question = font.render("Humor?", True, BLACK)
 
-        #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 # Game loop
 while True:
@@ -254,30 +263,26 @@ while True:
 
         pygame.display.flip()
     
-        
-        acc_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto gas.mp3"))
-        crash_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Auto crash.mp3"))
-        brake_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto bremsen.mp3"))
-        norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3"))
-        heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
-        missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
+    
 
         if folder == "me":
             
             pygame.mixer.music.set_volume(0.5)
-            heli_sound.set_volume(2)
+            heli_sound_me.set_volume(2)
         else:
             pygame.mixer.music.set_volume(0.7)
-            heli_sound.set_volume(0.5)
+            heli_sound_compi.set_volume(0.5)
         #play music
        
 
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
     elif game_state == "game_running":
         
-        
-        pygame.mixer.Sound.play(heli_sound, -1)
+        if folder == "compi":
+            pygame.mixer.Sound.play(heli_sound_compi, -1)
+        else:
+            pygame.mixer.Sound.play(heli_sound_me, -1)
     
         
          # Scroll the background
@@ -317,29 +322,81 @@ while True:
                 
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
                 player_y -= 6
-                pygame.mixer.Sound.play(acc_sound)
-            if not keys[pygame.K_UP]:
-                pygame.mixer.Sound.fadeout(acc_sound, 250)
-                
+            
             if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
                 player_y += 6
-                pygame.mixer.Sound.play(brake_sound)
                 
-            if not keys[pygame.K_DOWN]:
-
-                pygame.mixer.Sound.stop(brake_sound)
+                
+            
             if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                pygame.mixer.Sound.play(norm_sound)
                 if player_y < HEIGHT - HEIGHT / 5:
                     player_y += 2
 
-            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
-                pygame.mixer.Sound.stop(norm_sound)
+            
             
             player_x -= angle * 0.7
             
             if player_x <= WIDTH/1224*350 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
                 game_over = True
+            
+            #sound
+            if keys[pygame.K_UP]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(acc_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(acc_sound_me,-1)
+                    
+            if not keys[pygame.K_UP]:
+                if folder == "compi":
+                    pygame.mixer.Sound.fadeout(acc_sound_compi, 250)
+                else:
+                    pygame.mixer.Sound.fadeout(acc_sound_me, 250)
+                    
+                
+            if keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(brake_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(brake_sound_me,-1)
+            if not keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.stop(brake_sound_compi,)
+                else:
+                    pygame.mixer.Sound.stop(brake_sound_me)
+                            
+            if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.play(norm_sound_compi,-1)
+                else:
+                    pygame.mixer.Sound.play(norm_sound_me,-1)
+            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
+                if folder == "compi":
+                    pygame.mixer.Sound.stop(norm_sound_compi)
+                else:
+                    pygame.mixer.Sound.stop(norm_sound_me)
+                
+            
+           
+           
+           
+           
+#             if keys[pygame.K_UP] and folder == "me":
+ #               pygame.mixer.Sound.play(acc_sound_me)
+  #          if not keys[pygame.K_UP] and folder == "me":
+   #             pygame.mixer.Sound.fadeout(acc_sound_me, 250)
+   #             
+  #          if keys[pygame.K_DOWN] and folder == "me":
+   #             pygame.mixer.Sound.play(brake_sound_me)
+    #        if not keys[pygame.K_DOWN] and folder == "me":
+    #            pygame.mixer.Sound.stop(brake_sound_me)
+     #       
+      #      if not keys[pygame.K_UP] and not keys[pygame.K_DOWN] and folder == "me":
+       #         pygame.mixer.Sound.play(norm_sound_me)
+        #    if keys[pygame.K_UP] or keys[pygame.K_DOWN] and folder == "me":
+         #       pygame.mixer.Sound.stop(norm_sound_me)
+        
+        
+        
         
         # Calculate elapsed time
         current_time = time.time() - start_time
