@@ -232,10 +232,12 @@ def will_collide(new_car, existing_cars, lookahead=2000):
                     return True
     return False
 
+
+
 def remove_overlapping_cars(cars):
     cars_to_remove = []
 
-    # Sort cars in each lane by their y position
+    # Sort cars by their x position first, then by y position
     sorted_cars = sorted(cars, key=lambda car: (car.x, car.y))
 
     for i in range(len(sorted_cars) - 1):
@@ -243,13 +245,25 @@ def remove_overlapping_cars(cars):
 
         # Check only cars in the same lane
         if car1.x == car2.x:
-            # Check if car1 overlaps with car2
-            if car1.y < car2.y < car1.y + car1.image.get_height():
-                cars_to_remove.append(car2)  # Choose the car ahead to remove
+            # Check for overlap or close proximity
+            if is_overlapping(car1, car2):
+                cars_to_remove.append(car2)
+                print("was overlapping")  # Choose the car ahead to remove
 
-    # Remove the cars that are overlapping
+    # Remove the cars that are overlapping or too close
     for car in cars_to_remove:
         cars.remove(car)
+
+
+prox = 50  # Adjust this value as needed
+
+def is_overlapping(car1, car2):
+
+    close_in_y = (car1.y < car2.y + car2.image.get_height() + prox) and \
+                 (car2.y < car1.y + car1.image.get_height() + prox)
+
+    return close_in_y
+
 
 def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
     spawn_area_top = -new_car_height - buffer
@@ -719,21 +733,23 @@ while True:
                     if not will_collide(new_car, enemy_cars):
                         enemy_cars.append(new_car)
                         last_spawn_position[lane] = new_car.y  # Update last spawn position
+                        remove_overlapping_cars(enemy_cars)
                     else:
                         print("Collision predicted, car not spawned.")
                 else:
                     print("Spawn area not clear or car spawned too recently, car not spawned.")
+                remove_overlapping_cars(enemy_cars)
 
-                rotated_player_car = pygame.transform.rotate(player_car_img, angle)
-                player_mask = pygame.mask.from_surface(rotated_player_car)
-                for car in enemy_cars:
-                    enemy_mask = pygame.mask.from_surface(car.image)  
-                    offset = (car.x - player_x, car.y - player_y)
-                    
-                    if player_mask.overlap(enemy_mask, offset):
-                        game_over = True
+        rotated_player_car = pygame.transform.rotate(player_car_img, angle)
+        player_mask = pygame.mask.from_surface(rotated_player_car)
+        for car in enemy_cars:
+            enemy_mask = pygame.mask.from_surface(car.image)
+            offset = (car.x - player_x, car.y - player_y)
+            
+            if player_mask.overlap(enemy_mask, offset):
+                game_over = True
 
-                #collision check between player and car.
+        #collision check between player and car.
         
         for circle in circles:
             if not circle.explosion_triggered:
