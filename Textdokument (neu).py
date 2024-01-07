@@ -331,7 +331,7 @@ explosion_img_list = [explosion_img_frame1,
                       explosion_img_frame9
                       ] # ...
 
-
+multiplication = 1
 explosion_event = 0
 current_explosion_frame = 0
 
@@ -376,18 +376,21 @@ def explosion_anim():
 
     elif explosion_event == 2: # animate
         
+        
         # draw current frame
         global explosion_x
         global explosion_y
 
-        explosion_y += 10
+        explosion_y += 20 * multiplication 
         
-        print(explosion_x, explosion_y)
+        print(elapsed_time, explosion_x, explosion_y)
 
         explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
         center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2),
                 (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
+
+        print("blitting:", current_explosion_frame)
 
         screen.blit(pygame.transform.scale(explosion_img_list[current_explosion_frame], (
             explosion_img_list[current_explosion_frame].get_width() * 2,
@@ -758,11 +761,25 @@ while True:
         screen.blit(rotated_player_car, rotated_rect)
 
         #Helicopter
-        rotated_helicopter = pygame.transform.rotate(helicopter_img, angle)
+
+        heli_frame_0 = pygame.image.load(os.path.join(os.path.dirname(__file__), "heli_frame_0.png")).convert_alpha()
+        heli_frame_1 = pygame.image.load(os.path.join(os.path.dirname(__file__), "heli_frame_1.png")).convert_alpha()
+        heli_frame_2 = pygame.image.load(os.path.join(os.path.dirname(__file__), "heli_frame_2.png")).convert_alpha()
+        heli_frame_3 = pygame.image.load(os.path.join(os.path.dirname(__file__), "heli_frame_3.png")).convert_alpha()
+
+
+        heli_frame_list = [heli_frame_0,
+                         heli_frame_1,
+                         heli_frame_2,
+                         heli_frame_3,
+                         ]
+
+
+        rotated_helicopter = pygame.transform.rotate(heli_frame_list[elapsed_time % 4], angle)
         rotated_rect2 = rotated_helicopter.get_rect(center=(x_position2 +  rotated_helicopter.get_width() / 2, y_position2 + rotated_helicopter.get_height() / 2))
         screen.blit(rotated_helicopter, rotated_rect2)
 
-        explosion_anim()
+    
 
 
         # Draw circles, To change
@@ -812,8 +829,16 @@ while True:
         # Game over screen
         if game_over:
             
+            explode(player_x - 70, player_y - 10)
+
+            for i in range(50):
+                print("printing")
+                elapsed_time += 1
+                multiplication = 0
+                explosion_anim()
+
             font = pygame.font.Font(None, 36)
-            text = font.render("Game Over!", True, RED)
+            text = font.render("Game Over!", True, BLACK)
             text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
                 
             screen.blit(text, text_rect)
@@ -827,9 +852,14 @@ while True:
             pygame.mixer.Sound.stop(acc_sound_me)
             pygame.mixer.music.fadeout(3000)
             # Wait for a few seconds before quitting
+            
+
             pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
             pygame.quit()
             sys.exit()
             
+    explosion_anim()
+
+
     #different speed for cars, 4 lanes. hallo
     #66, 50, 311. rayan to change
