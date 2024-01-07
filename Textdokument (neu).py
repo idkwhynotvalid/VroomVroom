@@ -236,10 +236,12 @@ def will_collide(new_car, existing_cars, lookahead=2000):
                     return True
     return False
 
+
+
 def remove_overlapping_cars(cars):
     cars_to_remove = []
 
-    # Sort cars in each lane by their y position
+    # Sort cars by their x position first, then by y position
     sorted_cars = sorted(cars, key=lambda car: (car.x, car.y))
 
     for i in range(len(sorted_cars) - 1):
@@ -247,13 +249,25 @@ def remove_overlapping_cars(cars):
 
         # Check only cars in the same lane
         if car1.x == car2.x:
-            # Check if car1 overlaps with car2
-            if car1.y < car2.y < car1.y + car1.image.get_height():
-                cars_to_remove.append(car2)  # Choose the car ahead to remove
+            # Check for overlap or close proximity
+            if is_overlapping(car1, car2):
+                cars_to_remove.append(car2)
+                print("was overlapping")  # Choose the car ahead to remove
 
-    # Remove the cars that are overlapping
+    # Remove the cars that are overlapping or too close
     for car in cars_to_remove:
         cars.remove(car)
+
+
+prox = 50  # Adjust this value as needed
+
+def is_overlapping(car1, car2):
+
+    close_in_y = (car1.y < car2.y + car2.image.get_height() + prox) and \
+                 (car2.y < car1.y + car1.image.get_height() + prox)
+
+    return close_in_y
+
 
 def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
     spawn_area_top = -new_car_height - buffer
@@ -267,7 +281,15 @@ def is_spawn_area_clear(new_car_x, new_car_height, existing_cars, buffer=200):
                 return False
     return True
 
-
+def get_lane_position(lane, width, car_width):
+    lane_positions = [
+        width / 1224 * 400 - 0.5 * car_width,
+        width / 1224 * 508 - 0.5 * car_width,
+        width / 1224 * 610 - 0.5 * car_width,
+        width / 1224 * 713 - 0.5 * car_width,
+        width / 1224 * 815 - 0.5 * car_width
+    ]
+    return lane_positions[lane % NUM_LANES]
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -369,8 +391,10 @@ def explosion_anim():
     global explosion_event
     global current_explosion_frame
     global explosion_delay
-     
-    explosion_speed = 5
+
+
+    explosion_speed = 3
+
 
     if explosion_event == 1: # start animation
         explosion_event = 2
@@ -396,18 +420,24 @@ def explosion_anim():
                 (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
 
-        #print("blitting:", current_explosion_frame)
 
-        screen.blit(pygame.transform.scale(explosion_img_list[current_explosion_frame], (
+        print("blitting:", current_explosion_frame, explosion_x, explosion_y)
+
+
+        new_img = pygame.transform.scale(explosion_img_list[current_explosion_frame], (
             explosion_img_list[current_explosion_frame].get_width() * 2,
             explosion_img_list[current_explosion_frame].get_height() * 2
-        )), explosion_img_rect)
+        ))
+
+        screen.blit(new_img, explosion_img_rect)
         
         explosion_delay += 1
 
+        # time.sleep(0.0005)
         if explosion_delay % explosion_speed == 0:
             current_explosion_frame += 1
     
+        pygame.display.flip()
 
 
 
@@ -432,6 +462,7 @@ player_y = HEIGHT - HEIGHT / 5
 desired_helicopter_x = player_x
 # Initialize enemy cars
 enemy_cars = []
+last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
 #circles
 circles = []
 
@@ -473,13 +504,13 @@ moving_sprites = pygame.sprite.Group()
 first = 1
 iteration = 0
 
-
-
 pygame.init()
 
 game_state = "start_screen"
 
 start_screen_animation = StartScreenAnimation(scale=2.9)
+
+
 # Game loop
 while True:
     
@@ -690,40 +721,31 @@ while True:
 
 
 
-        last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
+
         
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
-                x_position = random.choice([
-                    WIDTH/1224*400 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*508 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*610 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*713 - 0.5 * selected_image.get_width(), 
-                    WIDTH/1224*815 - 0.5 * selected_image.get_width()
-                ])
+                x_position = get_lane_position(lane, WIDTH, selected_image.get_width())
                 new_car_height = selected_image.get_height()
                 new_car = Car(x_position, -new_car_height, random.randint(1, 8), selected_image)
 
-                # Check if spawn area is clear and no recent car has been spawned in this lane
                 if is_spawn_area_clear(x_position, new_car_height, enemy_cars) and \
                 (last_spawn_position[lane] < 0 or last_spawn_position[lane] - new_car_height > mindistance):
                     if not will_collide(new_car, enemy_cars):
                         enemy_cars.append(new_car)
-                        remove_overlapping_cars(enemy_cars)
                         last_spawn_position[lane] = new_car.y  # Update last spawn position
+                        remove_overlapping_cars(enemy_cars)
                     else:
                         print("Collision predicted, car not spawned.")
                 else:
-                    print("cant spawn")
+                    print("Spawn area not clear or car spawned too recently, car not spawned.")
                 remove_overlapping_cars(enemy_cars)
-                if remove_overlapping_cars(enemy_cars):
-                    print("ddd")
 
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
         for car in enemy_cars:
-            enemy_mask = pygame.mask.from_surface(car.image)  
+            enemy_mask = pygame.mask.from_surface(car.image)
             offset = (car.x - player_x, car.y - player_y)
             
             if player_mask.overlap(enemy_mask, offset):
@@ -800,10 +822,9 @@ while True:
 
                  circleexplo_x = int(circle_x - explosion_img_frame1.get_width()/2)
                  
-                 
-                 
+
                  if first == 1:
-                    print(circleexplo_x, circle.explosion_y)
+                    print("evaded", circleexplo_x, circle.explosion_y)
                     explode(circleexplo_x, circle.explosion_y)            
                     first = 0
   
@@ -824,11 +845,13 @@ while True:
             
             explode(player_x - 70, player_y - 10)
 
-            for i in range(50):
+            for i in range(200):
                 print("printing")
+                time.sleep(0.02)
                 elapsed_time += 1
                 multiplication = 0
                 explosion_anim()
+                pygame.display.flip()
 
             font = pygame.font.Font(None, 36)
             text = font.render("Game Over!", True, BLACK)
