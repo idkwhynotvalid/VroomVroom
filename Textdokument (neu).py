@@ -50,7 +50,7 @@ crash_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Auto crash.
 brake_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto bremsen.mp3"))
 
         #music import
-#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 
 class StartScreenAnimation(pygame.sprite.Sprite):
@@ -348,11 +348,13 @@ def explode(expl_x, expl_y):
     global current_explosion_frame
     global explosion_delay
 
-
-    print("explosion")
+    pygame.mixer.Sound.play(missile_sound_compi)
+    #print("explosion")
     current_explosion_frame = 0
     explosion_delay = 0
-
+    
+    
+    
     explosion_event = 1
     # 0 = stop
     # 1 = start
@@ -367,7 +369,7 @@ def explosion_anim():
     global explosion_event
     global current_explosion_frame
     global explosion_delay
-
+     
     explosion_speed = 5
 
     if explosion_event == 1: # start animation
@@ -387,14 +389,14 @@ def explosion_anim():
 
         explosion_y += 20 * multiplication 
         
-        print(elapsed_time, explosion_x, explosion_y)
+        #print(elapsed_time, explosion_x, explosion_y)
 
         explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
         center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2),
                 (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
 
-        print("blitting:", current_explosion_frame)
+        #print("blitting:", current_explosion_frame)
 
         screen.blit(pygame.transform.scale(explosion_img_list[current_explosion_frame], (
             explosion_img_list[current_explosion_frame].get_width() * 2,
@@ -554,8 +556,7 @@ while True:
         clock.tick(FPS)
 
 
-        #pygame.mixer.music.play(-1)
-#         pygame.mixer.music.play(-1)
+        pygame.mixer.music.play(-1)
 
 
     elif game_state == "game_running":
@@ -570,21 +571,7 @@ while True:
             pygame.mixer.Sound.play(norm_sound_me,-1)
             pygame.mixer.Sound.play(acc_sound_me,-1)
             
-        
-#        current_time = time.time() - start_time
-#        missile_time = current_time - 18
-#        
-#        missile_sound_compi.set_volume(0)
-#        
-#        if current_time == 18:
-#            missile_sound_compi.set_volume(1)
-#        if missile_time % 13 == 0:
-#            missile_sound_compi.set_volume(1)
-            
-    
-        
-         # Scroll the background
-        
+          
 
 
         # Ensure the background loops seamlessly
