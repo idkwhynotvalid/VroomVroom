@@ -216,7 +216,7 @@ def is_collision():
         if player_mask.overlap(warn_mask, offset):
             game_over = True
 
-def will_collide(new_car, existing_cars, lookahead=1200):
+def will_collide(new_car, existing_cars, lookahead=2000):
     new_car_bottom = new_car.bottom()
 
     for car in existing_cars:
@@ -273,7 +273,7 @@ score = 0
 
 #start_screen
 game_state = "start_screen"
-mindistance = 300
+mindistance = 1000
 
 # Load helicopter image
 helicopter_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
@@ -722,7 +722,9 @@ while True:
                         print("Collision predicted, car not spawned.")
                 else:
                     print("cant spawn")
-
+                remove_overlapping_cars(enemy_cars)
+                if remove_overlapping_cars(enemy_cars):
+                    print("ddd")
 
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
