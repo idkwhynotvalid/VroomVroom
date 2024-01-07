@@ -421,7 +421,7 @@ def explosion_anim():
         )
 
 
-        print("blitting:", current_explosion_frame, explosion_x, explosion_y)
+
 
 
         new_img = pygame.transform.scale(explosion_img_list[current_explosion_frame], (
@@ -824,7 +824,7 @@ while True:
                  
 
                  if first == 1:
-                    print("evaded", circleexplo_x, circle.explosion_y)
+
                     explode(circleexplo_x, circle.explosion_y)            
                     first = 0
   
@@ -846,7 +846,7 @@ while True:
             explode(player_x - 70, player_y - 10)
 
             for i in range(200):
-                print("printing")
+
                 time.sleep(0.02)
                 elapsed_time += 1
                 multiplication = 0
