@@ -313,7 +313,6 @@ def explode(expl_x, expl_y):
     global explosion_y
     global current_explosion_frame
     global explosion_delay
-    global scale
 
 
     print("explosion")
@@ -353,8 +352,8 @@ def explosion_anim():
         global explosion_y
 
         explosion_img_rect = explosion_img_list[current_explosion_frame].get_rect(
-        center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2) * scale ,
-                (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2) * scale )
+        center=((explosion_x + explosion_img_list[current_explosion_frame].get_width() / 2),
+                (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
 
         screen.blit(explosion_img_list[current_explosion_frame], explosion_img_rect)
