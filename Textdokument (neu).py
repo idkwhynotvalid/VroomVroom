@@ -308,7 +308,7 @@ helicopter_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "heli
 helicopter_scale = 0.05
 helicopter_img = pygame.transform.scale(helicopter_img, (int(helicopter_img.get_width() * helicopter_scale), int(helicopter_img.get_height() * helicopter_scale)))
 x_position2 = WIDTH // 2 - helicopter_img.get_width() // 2
-y_position2 = HEIGHT - helicopter_img.get_height() -50
+y_position2 = HEIGHT - helicopter_img.get_height() -100
 
 
 
