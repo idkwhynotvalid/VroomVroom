@@ -40,6 +40,30 @@ norm_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "auto norm.mp3
 heli_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Helicopter.mp3"))
 missile_sound = pygame.mixer.Sound(os.path.join("inf audio", folder, "Missile.mp3"))
 
+class background_load (pygame.sprite.Sprite):
+    def __innit__(self, pos_x, pos_y):
+        super().__innit__()
+        self.sprites = []
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_0.png"))))
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_1.png"))))
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_2.png"))))
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_3.png"))))
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_4.png"))))
+        self.sprites.append(pygame.image.load((os.path.join(os.path.dirname(__file__), "frame_5.png"))))
+        self.current_sprite = 0
+        self.image = self.sprites[self.current_sprite]
+        
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [0,0]
+    
+    def update(self):
+        self.current_sprite += 1
+        
+        if self.current_sprite >= len(self.sprites):
+            self.current_sprite = 0
+            
+        self.image = self.sprites[self.current_sprite]
+    
 
 class Helicopter:
     def __init__(self, x_position2):
@@ -224,6 +248,15 @@ text_question = font.render("Humor?", True, BLACK)
         #music import
 music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
+
+
+#spritegroup
+
+moving_sprites = pygame.sprite.Group()
+
+
+
+
 # Game loop
 while True:
     for event in pygame.event.get():
@@ -244,8 +277,9 @@ while True:
                 game_state = "game_running"
     
         # Draw start screen elements
-        screen.fill(GRAY)
-        screen.blit(text_question, (WIDTH // 2 - text_question.get_width() // 2, 200))
+        moving_sprites.draw(screen)
+        moving_sprites.update()
+        
         pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
         pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
         screen.blit(text_yes, (350, 315))
