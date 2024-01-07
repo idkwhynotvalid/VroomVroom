@@ -46,7 +46,36 @@ heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.m
 
 
         #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+
+class StartScreenAnimation(pygame.sprite.Sprite):
+    def __init__(self, scale=1.0):
+        super().__init__()
+        self.sprites = [
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_0.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_1.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_2.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_3.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_4.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_5.png")),
+        ]
+        self.current_sprite = 0
+        self.scale = scale
+        self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * scale), int(self.sprites[self.current_sprite].get_height() * scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [0, 0]
+        self.animation_speed = 5  # Adjust animation speed as needed
+        self.frame_counter = 0
+
+
+
+    def update(self):
+        self.frame_counter += 1
+        if self.frame_counter >= self.animation_speed:
+            self.frame_counter = 0
+            self.current_sprite = (self.current_sprite + 1) % len(self.sprites)
+            self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * self.scale), int(self.sprites[self.current_sprite].get_height() * self.scale)))
+
 
 class background_load (pygame.sprite.Sprite):
     def __innit__(self, pos_x, pos_y):
@@ -427,9 +456,11 @@ text_question = font.render("Humor?", True, BLACK)
 
 moving_sprites = pygame.sprite.Group()
 
+pygame.init()
 
+game_state = "start_screen"
 
-
+start_screen_animation = StartScreenAnimation(scale=2.9)
 # Game loop
 while True:
 
@@ -437,28 +468,36 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-            
-    if game_state == "start_screen":
-        # Display start screen options and wait for user input
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        elif game_state == "start_screen" and event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             if 300 <= mouse_pos[0] <= 500 and 300 <= mouse_pos[1] <= 350:
-                # Mattia sound if yes
                 folder = "me"
                 game_state = "game_running"
                 print("Starting the game...")  # Replace with your game start code
             elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
                 game_state = "game_running"
-                
+            
+    
+
+    
+
+
+    if game_state == "start_screen":
+        # Update and draw the animation during the start screen
+        screen.fill((0, 0, 0))
+    
+   
         
         # Draw start screen elements
-        moving_sprites.draw(screen)
-        moving_sprites.update()
+        start_screen_animation.update()
+        screen.blit(start_screen_animation.image, start_screen_animation.rect)
+
         
-        pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
-        pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
+        #pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
+        #pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
         screen.blit(text_yes, (350, 315))
         screen.blit(text_no, (360, 415))
+        screen.blit(text_question, (WIDTH/2-100, 100))
 
         pygame.display.flip()
     
@@ -472,9 +511,9 @@ while True:
             pygame.mixer.music.set_volume(0.5)
             heli_sound_compi.set_volume(0.3)
         #play music
-       
+        clock.tick(FPS)
 
-        pygame.mixer.music.play(-1)
+#         pygame.mixer.music.play(-1)
 
     elif game_state == "game_running":
         
