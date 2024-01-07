@@ -170,7 +170,6 @@ def is_collision():
     global game_over
     player_mask = pygame.mask.from_surface(rotated_player_car)
 
-    circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
     offset = (circle.x - player_x, circle.y - player_y)
     
     #if player_mask.overlap(circle_mask, offset):
@@ -243,7 +242,7 @@ score = 0
 
 #start_screen
 game_state = "start_screen"
-
+mindistance = 300
 
 # Load helicopter image
 helicopter_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
@@ -622,6 +621,8 @@ while True:
 
 
 
+        last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
+        
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
@@ -635,16 +636,17 @@ while True:
                 new_car_height = selected_image.get_height()
                 new_car = Car(x_position, -new_car_height, random.randint(1, 8), selected_image)
 
-                if is_spawn_area_clear(x_position, new_car_height, enemy_cars):
+                # Check if spawn area is clear and no recent car has been spawned in this lane
+                if is_spawn_area_clear(x_position, new_car_height, enemy_cars) and \
+                (last_spawn_position[lane] < 0 or last_spawn_position[lane] - new_car_height > mindistance):
                     if not will_collide(new_car, enemy_cars):
                         enemy_cars.append(new_car)
+                        remove_overlapping_cars(enemy_cars)
+                        last_spawn_position[lane] = new_car.y  # Update last spawn position
                     else:
                         print("Collision predicted, car not spawned.")
                 else:
-                    print("Spawn area not clear, car not spawned.")
-                remove_overlapping_cars(enemy_cars)
-
-
+                    print("cant spawn")
 
 
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
