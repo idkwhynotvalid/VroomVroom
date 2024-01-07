@@ -231,7 +231,7 @@ enemy_car_images = [
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck_2.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "truck_1.png")).convert_alpha(),
-
+]
 
 
 def scale_car_images(car_images, scale_factor):
@@ -314,7 +314,8 @@ while True:
                 print("Starting the game...")  # Replace with your game start code
             elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
                 game_state = "game_running"
-    
+                
+        
         # Draw start screen elements
         moving_sprites.draw(screen)
         moving_sprites.update()
@@ -344,8 +345,12 @@ while True:
         
         if folder == "compi":
             pygame.mixer.Sound.play(heli_sound_compi, -1)
+            pygame.mixer.Sound.play(norm_sound_compi,-1)
+            pygame.mixer.Sound.play(acc_sound_compi,-1)
         else:
             pygame.mixer.Sound.play(heli_sound_me, -1)
+            pygame.mixer.Sound.play(norm_sound_me,-1)
+            pygame.mixer.Sound.play(acc_sound_me,-1)
     
         
          # Scroll the background
@@ -385,16 +390,31 @@ while True:
                 
             if keys[pygame.K_UP] and player_y - HEIGHT / 10 >= 0:
                 player_y -= 6
-
+                acc_sound_me.set_volume(1)
+                acc_sound_compi.set_volume(1)
+                
+            else:
+                acc_sound_me.set_volume(0)
+                acc_sound_compi.set_volume(0)
             
             if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
                 player_y += 6
+                brake_sound_me.set_volume(1)
+                brake_sound_compi.set_volume(1)
+            else:
+                brake_sound_me.set_volume(0)
+                brake_sound_compi.set_volume(0)
                 
                 
             
             if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
                 if player_y < HEIGHT - HEIGHT / 5:
                     player_y += 2
+                norm_sound_me.set_volume(1)
+                norm_sound_compi.set_volume(1)
+            else:
+                norm_sound_me.set_volume(0)
+                norm_sound_compi.set_volume(0)
 
             
             
@@ -403,43 +423,7 @@ while True:
             if player_x <= WIDTH/1224*350 or player_x + player_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
                 game_over = True
          
-            #sound
-            if keys[pygame.K_UP]:
-                if folder == "compi":
-                    pygame.mixer.Sound.play(acc_sound_compi,-1)
-                else:
-                    pygame.mixer.Sound.play(acc_sound_me,-1)
-                    
-            if not keys[pygame.K_UP]:
-                if folder == "compi":
-                    pygame.mixer.Sound.fadeout(acc_sound_compi, 250)
-                else:
-                    pygame.mixer.Sound.fadeout(acc_sound_me, 250)
-                    
-                
-            if keys[pygame.K_DOWN]:
-                if folder == "compi":
-                    pygame.mixer.Sound.play(brake_sound_compi,-1)
-                else:
-                    pygame.mixer.Sound.play(brake_sound_me,-1)
-            if not keys[pygame.K_DOWN]:
-                if folder == "compi":
-                    pygame.mixer.Sound.stop(brake_sound_compi,)
-                else:
-                    pygame.mixer.Sound.stop(brake_sound_me)
-                            
-            if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
-                if folder == "compi":
-                    pygame.mixer.Sound.play(norm_sound_compi,-1)
-                else:
-                    pygame.mixer.Sound.play(norm_sound_me,-1)
-            if keys[pygame.K_UP] or keys[pygame.K_DOWN]:
-                if folder == "compi":
-                    pygame.mixer.Sound.stop(norm_sound_compi)
-                else:
-                    pygame.mixer.Sound.stop(norm_sound_me)
-                
-            
+     
            
 
         
@@ -555,6 +539,10 @@ while True:
             if circle.explosion_triggered:
                 circle.explosion_y += speed3 + 0.01 * distance_to_bottom + 0.1*current_time
                 collision_check_enabled = False
+                if folder == "compi":
+                    pygame.mixer.Sound.play(missile_sound_compi)
+                else:
+                    pygame.mixer.Sound.play(missile_sound_me)
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
             if circle.show_warning:
@@ -566,7 +554,8 @@ while True:
             # Draw the explosion circle
             if circle.explosion_triggered:
                 circleexplo_x = int(circle.explosion_x - explosion_img.get_width()/2)
-                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))            
+                screen.blit(explosion_img, (circleexplo_x, circle.explosion_y))
+                
   
 
 
@@ -584,14 +573,14 @@ while True:
 
         # Game over screen
         if game_over:
-            pygame.mixer.quit()
+            
             font = pygame.font.Font(None, 36)
             text = font.render("Game Over!", True, RED)
             text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
                 
             screen.blit(text, text_rect)
             pygame.display.flip()
-
+            pygame.mixer.quit()
             # Wait for a few seconds before quitting
             pygame.time.wait(3000)  # 3000 milliseconds (3 seconds)
             pygame.quit()
