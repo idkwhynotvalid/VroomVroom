@@ -50,7 +50,7 @@ crash_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Auto crash.
 brake_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "auto bremsen.mp3"))
 
         #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+music = pygame.mixer.music.load(os.path.join("inf audio", "DRIVE.mp3"))
 
 
 class StartScreenAnimation(pygame.sprite.Sprite):
