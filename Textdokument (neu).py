@@ -386,7 +386,7 @@ def explosion_anim():
     global current_explosion_frame
     global explosion_delay
 
-    explosion_speed = 5
+    explosion_speed = 3
 
     if explosion_event == 1: # start animation
         explosion_event = 2
@@ -412,18 +412,22 @@ def explosion_anim():
                 (explosion_y + explosion_img_list[current_explosion_frame].get_height() / 2))
         )
 
-        print("blitting:", current_explosion_frame)
+        print("blitting:", current_explosion_frame, explosion_x, explosion_y)
 
-        screen.blit(pygame.transform.scale(explosion_img_list[current_explosion_frame], (
+        new_img = pygame.transform.scale(explosion_img_list[current_explosion_frame], (
             explosion_img_list[current_explosion_frame].get_width() * 2,
             explosion_img_list[current_explosion_frame].get_height() * 2
-        )), explosion_img_rect)
+        ))
+
+        screen.blit(new_img, explosion_img_rect)
         
         explosion_delay += 1
 
+        # time.sleep(0.0005)
         if explosion_delay % explosion_speed == 0:
             current_explosion_frame += 1
     
+        pygame.display.flip()
 
 
 
@@ -490,13 +494,13 @@ moving_sprites = pygame.sprite.Group()
 first = 1
 iteration = 0
 
-
-
 pygame.init()
 
 game_state = "start_screen"
 
 start_screen_animation = StartScreenAnimation(scale=2.9)
+
+
 # Game loop
 while True:
     
@@ -823,10 +827,9 @@ while True:
 
                  circleexplo_x = int(circle_x - explosion_img_frame1.get_width()/2)
                  
-                 
-                 
+
                  if first == 1:
-                    print(circleexplo_x, circle.explosion_y)
+                    print("evaded", circleexplo_x, circle.explosion_y)
                     explode(circleexplo_x, circle.explosion_y)            
                     first = 0
   
@@ -847,11 +850,13 @@ while True:
             
             explode(player_x - 70, player_y - 10)
 
-            for i in range(50):
+            for i in range(200):
                 print("printing")
+                time.sleep(0.02)
                 elapsed_time += 1
                 multiplication = 0
                 explosion_anim()
+                pygame.display.flip()
 
             font = pygame.font.Font(None, 36)
             text = font.render("Game Over!", True, BLACK)
