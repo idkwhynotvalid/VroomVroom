@@ -430,7 +430,7 @@ while True:
                 player_y -= 6
 
             
-            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
+            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + player_car_img.get_height() <= HEIGHT:
                 player_y += 6
                 
                 
@@ -538,7 +538,7 @@ while True:
 
 
         for lane in range(NUM_LANES):
-            if random.randint(0, 800) < 4:
+            if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
                 x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*508 - 0.5 * selected_image.get_width(), WIDTH/1224*610 - 0.5 * selected_image.get_width(), WIDTH/1224*713 - 0.5 * selected_image.get_width(), WIDTH/1224*815 - 0.5 * selected_image.get_width()])
                 speed = random.randint(1, 8)
