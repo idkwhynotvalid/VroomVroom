@@ -136,7 +136,7 @@ def is_collision():
     
     if player_mask.overlap(circle_mask, offset):
 #        game_over = True
-        print("hallo")
+#       print("hallo")
 
 
 
