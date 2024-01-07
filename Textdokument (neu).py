@@ -175,12 +175,14 @@ explosion_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "explo
 warn_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "3818227.png")).convert_alpha()
 
 # Scale the car images
-car_scale1 = 1
+car_scale1 = 0.5
 car_scale2 = 0.1
-danger_scale = 2
+danger_scale = 1.5
+warn_scale = 1.4
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
 enemy_car_img = pygame.transform.scale(enemy_car_img, (int(enemy_car_img.get_width() * car_scale2), int(enemy_car_img.get_height() * car_scale2)))
 circle_img = pygame.transform.scale(circle_img, (int(circle_img.get_width() * danger_scale), int(circle_img.get_height() * danger_scale)))
+warn_img = pygame.transform.scale(warn_img, (int(warn_img.get_width() * warn_scale), int(warn_img.get_height() * warn_scale)))
 # Initialize player car position
 player_x = WIDTH // 2 - player_car_img.get_width() // 2
 
