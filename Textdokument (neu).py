@@ -53,7 +53,7 @@ missile_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Missile.m
 #music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
 
 class StartScreenAnimation(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, scale=1.0):
         super().__init__()
         self.sprites = [
             pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_0.png")),
@@ -64,7 +64,8 @@ class StartScreenAnimation(pygame.sprite.Sprite):
             pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_5.png")),
         ]
         self.current_sprite = 0
-        self.image = self.sprites[self.current_sprite]
+        self.scale = scale
+        self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * scale), int(self.sprites[self.current_sprite].get_height() * scale)))
         self.rect = self.image.get_rect()
         self.rect.topleft = [0, 0]
         self.animation_speed = 5  # Adjust animation speed as needed
@@ -77,7 +78,7 @@ class StartScreenAnimation(pygame.sprite.Sprite):
         if self.frame_counter >= self.animation_speed:
             self.frame_counter = 0
             self.current_sprite = (self.current_sprite + 1) % len(self.sprites)
-            self.image = self.sprites[self.current_sprite]
+            self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * self.scale), int(self.sprites[self.current_sprite].get_height() * self.scale)))
 
 
 class background_load (pygame.sprite.Sprite):
@@ -372,7 +373,7 @@ pygame.init()
 
 game_state = "start_screen"
 
-start_screen_animation = StartScreenAnimation()
+start_screen_animation = StartScreenAnimation(scale=2.9)
 # Game loop
 while True:
     for event in pygame.event.get():
@@ -404,10 +405,11 @@ while True:
         screen.blit(start_screen_animation.image, start_screen_animation.rect)
 
         
-        pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
-        pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
+        #pygame.draw.rect(screen, WHITE, (300, 300, 200, 50))
+        #pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
         screen.blit(text_yes, (350, 315))
         screen.blit(text_no, (360, 415))
+        screen.blit(text_question, (WIDTH/2-100, 100))
 
         pygame.display.flip()
     
