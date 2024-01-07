@@ -274,7 +274,7 @@ enemy_car_images = [
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "pickup_truck_2.png")).convert_alpha(),
     pygame.image.load(os.path.join(trafficfolder, "truck_1.png")).convert_alpha(),
-
+]
 
 
 def scale_car_images(car_images, scale_factor):
