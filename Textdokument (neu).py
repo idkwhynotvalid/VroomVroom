@@ -46,7 +46,38 @@ heli_sound_me = pygame.mixer.Sound(os.path.join("inf audio", "me", "Helicopter.m
 
 
         #music import
-music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+#music = pygame.mixer.music.load(r"inf audio\DRIVE.mp3")
+
+
+class StartScreenAnimation(pygame.sprite.Sprite):
+    def __init__(self, scale=1.0):
+        super().__init__()
+        self.sprites = [
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_0.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_1.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_2.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_3.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_4.png")),
+            pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_5.png")),
+        ]
+        self.current_sprite = 0
+        self.scale = scale
+        self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * scale), int(self.sprites[self.current_sprite].get_height() * scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [0, 0]
+        self.animation_speed = 5  # Adjust animation speed as needed
+        self.frame_counter = 0
+
+
+
+    def update(self):
+        self.frame_counter += 1
+        if self.frame_counter >= self.animation_speed:
+            self.frame_counter = 0
+            self.current_sprite = (self.current_sprite + 1) % len(self.sprites)
+            self.image = pygame.transform.scale(self.sprites[self.current_sprite], (int(self.sprites[self.current_sprite].get_width() * self.scale), int(self.sprites[self.current_sprite].get_height() * self.scale)))
+
+
 
 class background_load (pygame.sprite.Sprite):
     def __innit__(self, pos_x, pos_y):
@@ -170,7 +201,6 @@ def is_collision():
     global game_over
     player_mask = pygame.mask.from_surface(rotated_player_car)
 
-    circle_mask = pygame.mask.from_surface(warn_img)  # Assuming enemy_car has an 'image' attribute
     offset = (circle.x - player_x, circle.y - player_y)
     
     #if player_mask.overlap(circle_mask, offset):
@@ -243,7 +273,7 @@ score = 0
 
 #start_screen
 game_state = "start_screen"
-
+mindistance = 300
 
 # Load helicopter image
 helicopter_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "helicopter.jpg")).convert()
@@ -313,7 +343,6 @@ def explode(expl_x, expl_y):
     global explosion_y
     global current_explosion_frame
     global explosion_delay
-    global scale
 
 
     print("explosion")
@@ -431,9 +460,17 @@ text_question = font.render("Humor?", True, BLACK)
 #spritegroup
 
 moving_sprites = pygame.sprite.Group()
+
 first = 1
 iteration = 0
 
+
+
+pygame.init()
+
+game_state = "start_screen"
+
+start_screen_animation = StartScreenAnimation(scale=2.9)
 # Game loop
 while True:
     
@@ -442,23 +479,32 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-            
-    if game_state == "start_screen":
-        # Display start screen options and wait for user input
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        elif game_state == "start_screen" and event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             if 300 <= mouse_pos[0] <= 500 and 300 <= mouse_pos[1] <= 350:
-                # Mattia sound if yes
                 folder = "me"
                 game_state = "game_running"
                 print("Starting the game...")  # Replace with your game start code
             elif 300 <= mouse_pos[0] <= 500 and 400 <= mouse_pos[1] <= 450:
                 game_state = "game_running"
-        
+
+            
+    
+
+    
+
+
+    if game_state == "start_screen":
+        # Update and draw the animation during the start screen
+        screen.fill((0, 0, 0))
+    
+   
+
         
         # Draw start screen elements
-        moving_sprites.draw(screen)
-        moving_sprites.update()
+        start_screen_animation.update()
+        screen.blit(start_screen_animation.image, start_screen_animation.rect)
+
         
         bg_frame_0 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_0.png")).convert_alpha()
         bg_frame_1 = pygame.image.load(os.path.join(os.path.dirname(__file__), "frame_1.png")).convert_alpha()
@@ -484,6 +530,7 @@ while True:
         pygame.draw.rect(screen, WHITE, (300, 400, 200, 50))
         screen.blit(text_yes, (350, 315))
         screen.blit(text_no, (360, 415))
+        screen.blit(text_question, (WIDTH/2-100, 100))
 
         pygame.display.flip()
     
@@ -497,9 +544,12 @@ while True:
             pygame.mixer.music.set_volume(0.5)
             heli_sound_compi.set_volume(0.3)
         #play music
-       
+        clock.tick(FPS)
 
-        pygame.mixer.music.play(-1)
+
+        #pygame.mixer.music.play(-1)
+#         pygame.mixer.music.play(-1)
+
 
     elif game_state == "game_running":
         
@@ -646,6 +696,8 @@ while True:
 
 
 
+        last_spawn_position = [-1 for _ in range(NUM_LANES)]  # Initialize with -1
+        
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 3:
                 selected_image = random.choice(scaled_enemy_car_images)
@@ -659,16 +711,17 @@ while True:
                 new_car_height = selected_image.get_height()
                 new_car = Car(x_position, -new_car_height, random.randint(1, 8), selected_image)
 
-                if is_spawn_area_clear(x_position, new_car_height, enemy_cars):
+                # Check if spawn area is clear and no recent car has been spawned in this lane
+                if is_spawn_area_clear(x_position, new_car_height, enemy_cars) and \
+                (last_spawn_position[lane] < 0 or last_spawn_position[lane] - new_car_height > mindistance):
                     if not will_collide(new_car, enemy_cars):
                         enemy_cars.append(new_car)
+                        remove_overlapping_cars(enemy_cars)
+                        last_spawn_position[lane] = new_car.y  # Update last spawn position
                     else:
                         print("Collision predicted, car not spawned.")
                 else:
-                    print("Spawn area not clear, car not spawned.")
-                remove_overlapping_cars(enemy_cars)
-
-
+                    print("cant spawn")
 
 
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
