@@ -48,10 +48,12 @@ class Helicopter:
 
 
 class Car:
-    def __init__(self, x_position, initial_speed):
+    def __init__(self, x_position, initial_speed, image):
         self.x = x_position
-        self.y = -player_car_img.get_height() # Start above the screen
+        self.y = 2*-player_car_img.get_height() # Start above the screen
         self.speed = initial_speed
+        self.image = image
+
 
 class Circle:
     def __init__(self, player_x):
@@ -175,10 +177,24 @@ circle_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "warning.
 explosion_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "explo.png")).convert_alpha()
 
 warn_img = pygame.image.load(os.path.join(os.path.dirname(__file__), "3818227.png")).convert_alpha()
+trafficfolder = os.path.join(os.path.dirname(__file__), "traffic")
+enemy_car_images = [
+    pygame.image.load(os.path.join(trafficfolder, "lada_1.png")).convert_alpha(),
+    pygame.image.load(os.path.join(trafficfolder, "lada_2.png")).convert_alpha(),
+    pygame.image.load(os.path.join(trafficfolder, "lada_3.png")).convert_alpha(),
+    pygame.image.load(os.path.join(trafficfolder, "pickup_truck.png")).convert_alpha(),
+    pygame.image.load(os.path.join(trafficfolder, "pickup_truck_2.png")).convert_alpha(),
+    pygame.image.load(os.path.join(trafficfolder, "truck_1.png")).convert_alpha(),
+
+]
+
+def scale_car_images(car_images, scale_factor):
+    return [pygame.transform.scale(img, (int(img.get_width() * scale_factor), int(img.get_height() * scale_factor))) for img in car_images]
 
 # Scale the car images
 car_scale1 = 1
-car_scale2 = 0.1
+car_scale2 = 1.2
+scaled_enemy_car_images = scale_car_images(enemy_car_images, car_scale2)
 danger_scale = 1.4
 warn_scale = 1.4
 player_car_img = pygame.transform.scale(player_car_img, (int(player_car_img.get_width() * car_scale1), int(player_car_img.get_height() * car_scale1)))
@@ -323,7 +339,7 @@ while True:
             if not keys[pygame.K_UP]:
                 pygame.mixer.Sound.fadeout(acc_sound, 250)
                 
-            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + enemy_car_img.get_height() <= HEIGHT:
+            if keys[pygame.K_DOWN] and player_y + HEIGHT / 10 + player_car_img.get_height() <= HEIGHT:
                 player_y += 6
                 pygame.mixer.Sound.play(brake_sound)
                 
@@ -340,15 +356,16 @@ while True:
             
             player_x -= angle * 0.7
             
-            if player_x <= WIDTH/1224*350 or player_x + enemy_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
+            if player_x <= WIDTH/1224*350 or player_x + player_car_img.get_width() >= WIDTH-(WIDTH/1224*350):
                 game_over = True
+
         
         # Calculate elapsed time
         current_time = time.time() - start_time
         if int(current_time) % 1 == 0:
             score += 1/60
 
-        background_y += speed3 + 0.01 * distance_to_bottom + 0.3*current_time
+        background_y += speed3 + 0.01 * distance_to_bottom + 0.1*current_time
 
         
         
@@ -368,7 +385,7 @@ while True:
         distance_to_bottom = HEIGHT - player_y / 1.4
             # Move enemy cars and spawn new ones
         for car in enemy_cars:
-            car.y += (0.3*current_time) + car.speed + 0.01 * distance_to_bottom
+            car.y += (0.1*current_time) + car.speed + 0.01 * distance_to_bottom
             if car.y > HEIGHT:
                 enemy_cars.remove(car)
 
@@ -396,19 +413,23 @@ while True:
 
         for lane in range(NUM_LANES):
             if random.randint(0, 800) < 6:
-                x_position = random.choice([WIDTH/1224*400 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*500 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*600 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*700 - 0.5 * enemy_car_img.get_width(), WIDTH/1224*800 - 0.5 * enemy_car_img.get_width()])
-                too_close = any(abs(x_position - enemy_car.x) < enemy_car_img.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
+                selected_image = random.choice(scaled_enemy_car_images)
+
+
+                x_position = random.choice([WIDTH/1224*400 - 0.5 * selected_image.get_width(), WIDTH/1224*500 - 0.5 * selected_image.get_width(), WIDTH/1224*600 - 0.5 * selected_image.get_width(), WIDTH/1224*700 - 0.5 * selected_image.get_width(), WIDTH/1224*800 - 0.5 * selected_image.get_width()])
+                too_close = any(abs(x_position - enemy_car.x) < selected_image.get_width() for enemy_car in enemy_cars if enemy_car.y < HEIGHT and enemy_car.x == x_position)
                 if not too_close:
-                    speed = random.randint(1, 6)
-                    enemy_cars.append(Car(x_position, speed))
+                    speed = random.randint(1, 8)
+                    enemy_cars.append(Car(x_position, speed, selected_image))
         rotated_player_car = pygame.transform.rotate(player_car_img, angle)
         player_mask = pygame.mask.from_surface(rotated_player_car)
         for car in enemy_cars:
-            enemy_mask = pygame.mask.from_surface(enemy_car_img)  # Assuming enemy_car has an 'image' attribute
+            enemy_mask = pygame.mask.from_surface(car.image)  # Assuming enemy_car has an 'image' attribute
             offset = (car.x - player_x, car.y - player_y)
             
             if player_mask.overlap(enemy_mask, offset):
                 game_over = True
+
         #collision check between player and car.
         
         for circle in circles:
@@ -426,7 +447,7 @@ while True:
     
         # Draw car
         for car in enemy_cars:
-            screen.blit(enemy_car_img, (car.x, car.y))
+            screen.blit(car.image, (car.x, car.y))
 
         rotated_rect = rotated_player_car.get_rect(center=(player_x + rotated_player_car.get_width() / 2, player_y + rotated_player_car.get_height() / 2))
         # Draw rotated player car
@@ -440,9 +461,6 @@ while True:
 
 
 
-        # Draw enemy cars
-        for car in enemy_cars:
-            screen.blit(enemy_car_img, (car.x, car.y))
 
 
 
@@ -452,7 +470,7 @@ while True:
             circle_x = int(circle.x - circle_img.get_width()/2)  
             circle_y = int(circle.y - circle_img.get_height()/2) 
             if circle.explosion_triggered:
-                circle.explosion_y += speed3
+                circle.explosion_y += speed3 + 0.01 * distance_to_bottom + 0.1*current_time
                 collision_check_enabled = False
             if checkingsth == True:
                 screen.blit(circle_img, (circle_x, circle_y))
