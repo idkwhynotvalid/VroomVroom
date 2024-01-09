@@ -719,7 +719,7 @@ while True:
 
         
         for lane in range(NUM_LANES):
-            if random.randint(0, 800) < 3:
+            if random.randint(0, 800) < 2:
                 selected_image = random.choice(scaled_enemy_car_images)
                 x_position = get_lane_position(lane, WIDTH, selected_image.get_width())
                 new_car_height = selected_image.get_height()
